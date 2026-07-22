@@ -1,0 +1,7 @@
+item_code,construct,question,response_type,options,constraint
+EX01,Example: single choice,REPLACE ME - single-select example: What is your age group?,single_select,18-22|23-27|28-32|33+,0
+EX02,Example: likert,REPLACE ME - Likert example: I prefer well-known brands.,likert5,,0
+EX03,Example: multi choice,REPLACE ME - multi-select example: Which categories do you buy? (pick up to 3),multi_select,Groceries|Electronics|Fashion|Books,0
+EX04,Example: short text,REPLACE ME - short free-text example: Which city do you live in?,short_text,,0
+EX05,Example: long text,REPLACE ME - long free-text example: Describe your biggest purchase regret.,long_text,,0
+EX06,Example: constraint,REPLACE ME - constraint example (note constraint=1): Allergies or ingredients you must avoid:,short_text,,1

@@ -1,0 +1,89 @@
+/**
+ * build_form.gs — Auto-generate the Digital Twin questionnaire as a Google
+ * Form from questionnaire_items.csv, with responses collected in a Sheet.
+ *
+ * SETUP (once, ~5 minutes):
+ *  0. Author your own items first — see AUTHORING_GUIDE.md. The shipped CSV
+ *     contains only EXAMPLE rows (EX01–EX06) that must be replaced.
+ *  1. Create a new Google Sheet. File > Import > Upload questionnaire_items.csv
+ *     (replace spreadsheet; keep the header row). Name the tab "items".
+ *  2. Extensions > Apps Script. Paste this file. Run buildForm(). Authorize.
+ *  3. The log prints the Form edit URL. Open it, then: Responses > link to a
+ *     Sheet (this becomes the cohort master dataset).
+ *  4. In Form settings: collect email = ON, limit 1 response = ON.
+ *  5. Add one manual first question yourself if you prefer, or keep the
+ *     scripted STUDENT_ID item as-is (course-issued pseudonym, validated).
+ *
+ * The response Sheet then has one row per student — the research dataset —
+ * and each student's row is exported to their VM via make_persona.py.
+ */
+
+var LIKERT5 = ['1 - Strongly disagree', '2 - Disagree', '3 - Neutral',
+               '4 - Agree', '5 - Strongly agree'];
+
+function buildForm() {
+  var sheet = SpreadsheetApp.getActive().getSheetByName('items');
+  var rows = sheet.getDataRange().getValues();
+  var header = rows.shift(); // item_code,construct,question,response_type,options
+
+  // Guard: refuse to build from the placeholder examples
+  var codes = rows.map(function (r) { return String(r[0]); });
+  if (codes.some(function (c) { return c.indexOf('EX0') === 0; })) {
+    throw new Error('questionnaire_items.csv still contains EX0x example ' +
+                    'rows — replace them with your own items first ' +
+                    '(see AUTHORING_GUIDE.md).');
+  }
+
+  var form = FormApp.create('Digital Twin Lab — Consumer Profile (' +
+                            rows.filter(function (r) { return r[0]; }).length +
+                            ' items)');
+  form.setDescription(
+    'Answer honestly as yourself, not aspirationally — your agent will only ' +
+    'be as accurate as these answers. Takes ~25 minutes. Your responses are ' +
+    'stored under your course pseudonym; see the research information sheet ' +
+    'for data handling and opt-out.');
+  form.setProgressBar(true);
+
+  // Pseudonym ID (validated pattern DT2026-###)
+  var idItem = form.addTextItem()
+      .setTitle('Your course-issued participant ID (e.g. DT2026-042)')
+      .setRequired(true);
+  var v = FormApp.createTextValidation()
+      .requireTextMatchesPattern('DT\\d{4}-\\d{3}')
+      .setHelpText('Format: DT2026-042 (on your course ID card/email)')
+      .build();
+  idItem.setValidation(v);
+
+  var currentSection = null;
+  rows.forEach(function (r) {
+    var code = r[0], construct = r[1], question = r[2],
+        type = r[3], options = r[4];
+    if (!code) return;
+
+    // New page per construct group keeps the form navigable
+    var group = String(construct).split(':')[0];
+    if (group !== currentSection) {
+      form.addPageBreakItem().setTitle(group);
+      currentSection = group;
+    }
+
+    var title = code + '. ' + question;
+    if (type === 'likert5') {
+      form.addMultipleChoiceItem().setTitle(title)
+          .setChoiceValues(LIKERT5).setRequired(true);
+    } else if (type === 'single_select') {
+      form.addMultipleChoiceItem().setTitle(title)
+          .setChoiceValues(String(options).split('|')).setRequired(true);
+    } else if (type === 'multi_select') {
+      form.addCheckboxItem().setTitle(title)
+          .setChoiceValues(String(options).split('|')).setRequired(true);
+    } else if (type === 'long_text') {
+      form.addParagraphTextItem().setTitle(title).setRequired(true);
+    } else { // short_text
+      form.addTextItem().setTitle(title).setRequired(true);
+    }
+  });
+
+  Logger.log('Form created. Edit URL: ' + form.getEditUrl());
+  Logger.log('Share URL: ' + form.getPublishedUrl());
+}
