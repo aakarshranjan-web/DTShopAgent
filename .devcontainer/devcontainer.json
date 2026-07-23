@@ -16,8 +16,9 @@
   "forwardPorts": [6080],
   "portsAttributes": {
     "6080": {
-      "label": "Lab Desktop (open in browser, password: dtlab)",
-      "onAutoForward": "openBrowser"
+      "label": "Lab Desktop (KEEP PRIVATE — password printed in setup log)",
+      "onAutoForward": "openBrowser",
+      "visibility": "private"
     }
   },
   "postCreateCommand": "bash .devcontainer/setup.sh",

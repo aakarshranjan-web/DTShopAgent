@@ -1,12 +1,14 @@
 # Cloud route — identical free environments via GitHub Codespaces
 
-> **STATUS: fallback route.** The course runs GitHub-Classroom-free and the
-> datacenter-IP CAPTCHA cost is real, so local VMs (VM_DISTRIBUTION.md) are
-> primary. Keep this route for students whose laptops can't run a VM; the
-> human-first protocol (dtlab-shop before the agent) partially offsets the
-> IP problem even here, because the agent takes over a human-warmed session.
+> **STATUS: PRIMARY route.** `COURSE_PLAN_1WEEK.md` is the single authority
+> on the infrastructure decision: Codespaces on free personal accounts is
+> primary, subject to confirmation by the instructor dry run (T-21); local
+> VMs (`provisioning/VM_DISTRIBUTION.md`) are the fallback for students
+> whose accounts get flagged or in case the dry run fails. The
+> datacenter-IP CAPTCHA cost is real and is mitigated by the human-first
+> protocol (dtlab-shop before the agent hands over a human-warmed session).
 
-## Can this be done on a free cloud VM? Yes — with one honest caveat.
+## Can this be done on a free cloud VM? Yes — with one known cost.
 
 **Recommended free path: GitHub Codespaces + GitHub Classroom.** Every
 student gets the *bit-identical* container environment defined in
@@ -15,35 +17,44 @@ launched from a browser link with zero local installation, on Windows,
 Intel Mac, Apple Silicon, or a library computer alike. This dissolves the
 two-architecture VM problem entirely.
 
-Why it's free:
-- Verified students get free Codespaces use, up to 180 core-hours per month
-  on their personal accounts (GitHub Student Developer Pack; MBA students
-  qualify via university email). On the 2-core / 8 GB machine this config
-  requests, that's ~90 machine-hours/month — the whole lab needs maybe 10.
-- Alternatively, run it through **GitHub Classroom**: codespaces launched
-  in assignment repos bill to the classroom organization's education
-  allowance, not to students — so students don't even need the Student
-  Pack, just a GitHub account. Verify current quotas against GitHub's
-  education docs at term start; allowances have shifted over the years.
+Why it's free (**verify all quota numbers at term start** — GitHub has
+shifted these repeatedly; the two figures below come from different plan
+tiers and must be reconciled against GitHub's current docs before the
+course commits):
+- Free personal accounts include ~120 core-hours/month (≈60 h runtime on
+  the 2-core machine this config requests) — the figure the operative plan
+  (`COURSE_PLAN_1WEEK.md`) relies on; the lab needs ~8–10 h.
+- Verified students (GitHub Student Developer Pack) get more (~180
+  core-hours), but the Pack adds a verification wait the one-week format
+  can't absorb — treat it as headroom, not a dependency.
+- GitHub Classroom (billing to a classroom org) exists as an alternative,
+  but the plan deliberately avoids the organizational dependency.
 
 How it works for the student:
-1. Accept the GitHub Classroom assignment link → "Create codespace".
-2. Wait ~4 min for first build (the setup script installs everything).
+1. Open the course template repo → "Create codespace".
+2. Wait ~4 min for first build (the setup script installs everything;
+   with prebuilds enabled on the template repo, much less).
 3. Click the auto-forwarded **Lab Desktop** port → a Linux desktop opens
-   in a browser tab (noVNC, password `dtlab`). Chromium runs there.
-4. Use the VS Code terminal for the same three commands as the VM route:
-   `dtlab-start`, `dtlab-record`, `dtlab-pack`.
+   in a browser tab (noVNC; the per-codespace password is printed in the
+   setup log / terminal). **Never set this port to Public** — a public
+   port hands a desktop logged into your Amazon account to anyone with
+   the URL. Chromium runs there.
+4. Use the VS Code terminal for the four commands, same as the VM route:
+   `dtlab-shop`, `dtlab-start`, `dtlab-record`, `dtlab-pack`.
 5. The packed evidence zip is downloaded via the VS Code file explorer
    (right-click → Download) and uploaded to the LMS.
 6. **Stop the codespace when done** (it also auto-suspends after 30 min
    idle) — core-hours only burn while running.
 
-Instructor setup (once): create the course GitHub organization, apply for
-GitHub Education teacher benefits, make a template repo containing this
-kit (`.devcontainer/` is at the repo root already). Do one full dry run yourself — including a real amazon.in
-session — before committing the cohort to this route.
+Instructor setup (once): make this kit a **template repo**
+(`.devcontainer/` is at the repo root already), pin the installer
+checksums (TA_ONBOARDING.md > "Updating installer pins"), and enable
+**Codespaces prebuilds** on the template so all 161 students get one
+frozen, pre-tested image (and skip most of the 4–6 min build). Do one
+full dry run yourself — including a real amazon.in session — before
+committing the cohort to this route.
 
-## The one honest caveat: datacenter IPs
+## The known cost: datacenter IPs
 
 Codespaces egress from Microsoft Azure datacenter IP ranges. Amazon's
 anti-bot systems treat datacenter traffic with more suspicion than the
@@ -76,4 +87,4 @@ fallback for students whose laptops can't run a VM.
   spins up N identical VMs with web desktops; students get a URL): the most
   controlled option and effectively free via university cloud-credit
   programs, but it makes the instructor the fleet's sysadmin for the week
-  and shares the same datacenter-IP caveat. Keep as plan C.
+  and shares the same datacenter-IP cost. Keep as plan C.

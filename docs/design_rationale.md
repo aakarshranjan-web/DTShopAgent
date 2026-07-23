@@ -3,14 +3,16 @@
 **What this document is.** The definitive record of every consequential
 design decision in this package, with the argument for it and the
 alternatives that were considered and rejected. It exists so that anyone
-working on the kit (TA, co-instructor, future self, reviewer) understands
+working on the kit (TA, co-instructor, future self) understands
 not just *what* the design is but *why it must be this way* — and which
 parts are load-bearing versus merely convenient. Operational details live
 in `COURSE_PLAN_1WEEK.md`; this file carries the reasoning.
 
-**What the lab is.** ~180 MBA students each configure an autonomous agent
-as their consumer digital twin (grounded in a 100-item questionnaire and
-their real amazon.in purchase history), shop three standardized tasks both
+**What the lab is.** 161 MBA students (two sections of 80 and 81) each
+configure an autonomous agent
+as their consumer digital twin (grounded in a 115-item questionnaire and
+their real amazon.in purchase history), shop five standardized
+self-purchase category tasks both
 themselves and via the agent under a counterbalanced order design, and
 evaluate the agent's choices against their own. The exercise is
 simultaneously a course module on agentic AI and a paired human/agent
@@ -52,26 +54,48 @@ log paths drift between versions. Mitigation: the docs-are-canonical
 norm, a pinned dry run on the final environment before the course week,
 and a TA work item to log every deviation.
 
-## 2. Model backend: Claude API, one capped workspace
+## 2. Model backend: Claude API, student-owned accounts
 
-**Decision.** Claude (Sonnet-class) via API keys issued per student from
-a single course workspace with a hard spend cap; keys generated
-programmatically and revoked after the course.
+**Decision (updated 2026-07).** Claude (Sonnet-class) via each student's
+**own Anthropic account and API key**, set up before lab week from an
+LMS checklist (Console account, billing, small credit purchase, a
+personal ~$10 monthly spend limit, one key). The pre-flight collects the
+key with hidden input into a 600-permission env file; the packer redacts
+key patterns from every artifact.
 
 **Why.** Agentic browser loops need a frontier-quality model to be
 reliable enough for a *timed classroom session* — a failed run at minute
-70 of a 3-hour session with 180 people has no retry slack. Sonnet-class
+70 of a 3-hour session with ~80 people has no retry slack. Sonnet-class
 models deliver that reliability at a cost where a full three-task run is
-well under $2; an $8/student cap covers retries, making total course cost
-trivial against 15 contact hours. One workspace gives central kill-switch,
-observability, and rate-limit management.
+well under $2; a ~$10 personal spend limit covers retries, making total
+course cost trivial against 15 contact hours. Student-owned accounts
+distribute rate limits — every account has its own request and token
+budget, so ~80 concurrent agents share nothing, and prompt-cache reads
+are exempt from input-token limits on current models. Each student also
+leaves the course owning a working API account — itself a course
+outcome.
 
 **Rejected.** *Local models (Ollama etc.)*: "free" is illusory here — on
 CPU-only cloud containers or student laptops, small local models are too
 slow and too error-prone for multi-step browser control; the failure mode
 is silent classroom chaos. Retained only as an optional "hard mode"
-footnote. *Students' own API accounts*: unbillable, unsupportable, and
-uncapped at N=180.
+footnote. *A single course workspace issuing per-student keys*: central
+caps and a kill switch are attractive, but one org-level rate-limit pool
+under ~80 concurrent browser agents is the binding constraint, and
+generating, distributing, and revoking 161 keys is avoidable logistics.
+The per-account spend limit replaces the central cap; the cost of losing
+the central kill switch is bounded by that same limit (~$10/student).
+
+**Model policy (2026-07 update).** Anthropic models only, **all settings
+at defaults** — no temperature or sampling overrides. (Temperature-0
+discipline belongs to survey-elicitation protocols; our agent runs are
+interactive tool-use sessions, a different regime.)
+Optional second between-subjects factor, decided at term start on budget:
+**economy tier** (Claude Haiku class) vs. **frontier tier** (Claude Sonnet
+class), randomized stratified and orthogonal to the order arm, tier
+recorded per student in the manifest — a capability-vs-fidelity
+comparison at near-zero design cost. Default if not adopted: frontier
+tier for all. (See `questionnaire_instrument_source.md` §1.)
 
 ## 3. Infrastructure: GitHub Codespaces on free personal accounts
 
@@ -80,7 +104,7 @@ students create a plain (free) GitHub account, open the template repo,
 click *Create codespace*, and get a bit-identical Linux desktop (noVNC in
 a browser tab) with Hermes, Chromium, and all lab tooling pre-provisioned.
 
-**Why.** Three constraints dominate at N=180 in one week: identical
+**Why.** Three constraints dominate at N=161 in one week: identical
 environments, near-zero per-student setup, and zero dependence on
 heterogeneous student hardware. Codespaces is the only free option that
 satisfies all three. Every free personal GitHub account includes 120
@@ -91,7 +115,7 @@ account, click a link, wait four minutes," which fits inside Session 1
 with a triage buffer.
 
 **Rejected.** *Local VMs (VirtualBox/UTM golden images)*: the earlier
-primary route. Sound at small N with lead time, it collapses under 180
+primary route. Sound at small N with lead time, it collapses under 161
 students × heterogeneous laptops × one week: two CPU architectures, BIOS
 virtualization toggles, Hyper-V conflicts, RAM-starved hosts — a
 hypervisor help desk the course cannot staff. Retained in
@@ -103,7 +127,7 @@ verification and capacity lotteries — not classroom-reliable.
 *Instructor-hosted cloud fleet*: most controlled, but makes the
 instructor a sysadmin for the week; kept as plan C.
 
-**Accepted risk — the one honest cost.** Codespaces egress from Azure
+**Accepted risk — the one real cost.** Codespaces egress from Azure
 datacenter IPs, which Amazon's anti-bot systems treat with more suspicion
 than residential IPs: more login OTPs, more mid-run CAPTCHAs. Three
 compensations: the human-first session-warming effect (§6), the SOUL
@@ -138,7 +162,7 @@ the course. The traceability rule imports reference-verification
 discipline into the agent's self-briefing and makes confabulated
 "history" auditable against the session transcript.
 
-**Trade-off, honestly priced.** Agent-read history is less precise than
+**Trade-off, priced in.** Agent-read history is less precise than
 the official export (no guaranteed completeness, no exact unit
 economics). Accepted because the profile's role is preference grounding,
 not accounting — and the precise path survives as an optional
@@ -147,19 +171,47 @@ validation subsample, where the export's latency no longer matters.
 
 ## 5. The questionnaire: instructor-authored, code-addressed, pipeline-enforced
 
-**Decision.** The instructor supplies the ~100 items in a fixed CSV
-contract (`item_code, construct, question, response_type, options,
-constraint`). An Apps Script builds the Google Form from that CSV;
-responses land in one Sheet (one row per student = the cohort persona
-dataset); a batch tool generates per-student persona files overnight.
-Item codes are the load-bearing element: they appear in Form headers,
-survive into the persona file, and `SOUL.md` obliges the agent to cite
-them verbatim in its decision log.
+**Decision.** The instrument is the instructor's: **115 items**, authored
+in `questionnaire_instrument_source.md` (the authoritative source; the
+CSV is its machine transfer) in a fixed CSV contract (`item_code,
+construct, question, response_type, options, constraint`). Composition:
+15 India-adapted demographics, **57 items from 12 published, validated
+consumer scales** (selection follows the Toubia et al. 2025 Twin-2K-500
+battery — Big Five, Need for Cognition, agentic/communal values,
+minimalism, green values, social desirability, individualism/
+collectivism, regulatory focus, tightwad–spendthrift, need for
+uniqueness, self-monitoring, maximization), 22 amazon.in
+shopping-behavior items, 12 values/constraints (VC01–VC05 carry the
+CONSTRAINT flag), and 9 predictive items that give the comparison memo
+direct stated-preference benchmarks (PR09 was authored for a gift
+task; see §8 on its status under the self-purchase task set). Using
+validated scales makes the persona citable and comparable across
+studies rather than ad hoc. An Apps Script builds the Google Form from
+the CSV; responses land in one Sheet (one row per student = the cohort
+persona dataset); a batch tool generates per-student persona files
+overnight. Item codes are the load-bearing element: they appear in Form
+headers, survive into the persona file, and `SOUL.md` obliges the agent
+to cite them verbatim in its decision log.
+
+**The agent-side treatment now has a name: the Evidence-Citation
+Protocol (ECP).** Two components, both in `SOUL.md`: (1) every rejection
+and selection cites a persona item code or the purchase profile; (2) an
+explicit anti-stereotyping rule — never infer preferences from
+demographic group membership, only from this person's stated answers
+and observed behavior. What this lab deliberately does NOT adopt from
+the survey-simulation paradigm: persona-format comparison arms, a
+heuristics-and-biases holdout battery, a retest wave, and temperature-0
+elicitation discipline — all apparatus for validating *simulated survey
+answers*, whereas this lab validates *executed behavior* (real picks vs.
+real picks, logged process vs. logged process). See
+`questionnaire/questionnaire_instrument_source.md` §1 for the full
+included/excluded record and §3 for the scale references.
 
 **Why each piece.** *Instructor-authored*: instrument design is the
-professor's scientific contribution; the kit ships enforcing placeholders
-(all downstream tools hard-fail until real items exist) so a draft can
-never silently reach students. *Form-from-CSV rather than a shared
+professor's scientific contribution; the real items are now in place, and
+the EX0x placeholder hard-fail guards remain in the Form builder and
+persona generator as protection against accidental reversion to examples.
+*Form-from-CSV rather than a shared
 sheet*: forced responses, validated pseudonym IDs, one-submission-per-
 person, and zero transcription between collection and dataset. *Codes as
 citation vocabulary*: they make the agent's reasoning machine-auditable —
@@ -171,9 +223,75 @@ flag*: inviolable rules (allergies, dietary/religious exclusions, hard
 budget rules) travel as data, so "constraints always win" holds under any
 coding scheme without hard-coding a single item anywhere.
 
-## 6. Order of shopping: counterbalanced arms with enforced blinding
+## 5b. Optional questionnaire-ablation factor: what does the instrument buy?
 
-**Decision.** Students are randomized (stratified, pre-assigned) into two
+**Decision (2026-07; now ON as the plan of record).** A within-subject
+ablation: the agent runs the same task set with persona grounding
+(questionnaire + purchase profile) and ablated grounding (purchase
+profile alone) in counterbalanced order, while the human shops once. In
+the operative plan this runs on BOTH lab days — once per model tier —
+forming the four-run 2×2 (grounding × tier) described in
+research_protocol §1; tier is confounded with day by design and stated
+as such.
+
+**Why.** The literature is genuinely unclear on how much of a twin's
+fidelity comes from stated preferences versus revealed behavior; this
+design turns the questionnaire's marginal value into an estimand instead
+of an assumption. The within-person contrast is the strong version: each
+student is their own control, and three measures fall out per
+participant — paired verdicts against the same human picks, a per-task
+head-to-head (which twin chose better for me), and direct pick overlap
+between the two runs (identical picks = the questionnaire changed
+nothing on that task).
+
+**Why same tasks rather than a second task set.** A second set would
+avoid cross-run search carry-over but costs a doubled human session
+(every task needs a human benchmark), loses the head-to-head and the
+overlap measure, and adds a task-set × condition confound. Same-tasks
+keeps the human session unchanged and converts carry-over into an
+estimable order effect via P_FIRST/NP_FIRST counterbalancing — the
+same counterbalancing logic used throughout the design.
+
+**Enforcement, not instruction (the house principle).** The ablated run
+does not merely *ignore* the questionnaire: `dtlab-start` physically
+moves the persona files out of the workspace (into `~/dtlab/persona_hold/`,
+which the ablated SOUL is barred from), swaps in an ablated SOUL variant,
+and archives run 1's decision log before run 2 starts (so the ablated
+agent can never read a persona-citing log). The packer then runs a
+**manipulation check** — the ablated decision log must cite zero persona
+item codes — and records condition, order, head-to-head winners, and
+pick overlap in the manifest. Regression-tested end to end.
+
+**Accepted risks.** (a) The ablated run is blind to CONSTRAINT items
+(allergies, exclusions) — harmless under add-to-cart-only, and any
+violation becomes a measured outcome plus comparison-memo material; the
+consent sheet names it. (b) Roughly +45 minutes of agent time per
+student; the week's spare classroom hours absorb it. (c) Bootstrap runs
+once per day — later runs reuse the existing purchase_profile.md, holding
+revealed-preference grounding constant across conditions by design.
+
+## 6. Order of shopping: human-first with universal assessment blinding
+
+**Decision (updated 2026-07-23, supersedes the two-arm design below).**
+All students shop first (Wednesday), committing picks before any agent
+run; the agent then runs the task set four times in the within-student
+2×2 (grounding × tier; §5b and research_protocol §1). The
+H_FIRST/A_FIRST counterbalance is retired: the primary estimands are now
+within-student contrasts across agent runs that share the same
+human-perturbed account, so human-session carry-over common to all runs
+cancels in those contrasts, and the absolute agreement level carries the
+per-run contamination index as covariate (PERSONALIZATION_PROTOCOL
+Layers 1–3). What the arms bought — an experimental order-effect
+estimate — is given up for a simpler week and a stronger design where it
+matters. **Blinding is now universal rather than arm-specific:** no
+student watches their own agent, ever. Watching your own agent reason
+anchors the later verdicts and satisfaction ratings, so self-selected
+pairs swap seats for every run — the partner babysits, handles CAPTCHAs,
+screenshots and empties the cart — and owners first meet their agent's
+choices as artifacts when writing the memo. The pairing disclosure is in
+the consent sheet.
+
+**Original two-arm design (retained for the record).** Students are randomized (stratified, pre-assigned) into two
 arms. **H_FIRST**: the student shops the three tasks first in an
 instrumented browser (`dtlab-shop`, clickstream logged), confirms picks,
 then the agent runs. **A_FIRST**: the agent runs first — *babysat by a
@@ -223,20 +341,24 @@ history grounding simultaneously.
 History for 1 day** (Browsing History → gear → Pause History) and remove
 existing items from view. The pause, unlike the permanent toggle, is
 purpose-built for temporary use and self-reverses — nothing left changed
-on 180 personal accounts. It closes the browsing-driven surfaces
+on 161 personal accounts. It closes the browsing-driven surfaces
 ("previously viewed", "inspired by your browsing"), which are the
 contamination channel, while purchase-driven surfaces remain (baseline,
-wanted). Honest limits: enforcement is a self-attested gate in
+wanted). Known limits: enforcement is a self-attested gate in
 `dtlab-start` (the ceiling of verifiability at scale), and pausing kills
 the visible channel, not provably every internal session signal — hence
 the layers below.
 
-**Layer 2 — block (agent side):** the human must shop naturalistically
-and cannot be constrained; the agent can be constrained completely.
-`SOUL.md` restricts candidate generation to de-novo keyword searches the
-agent formulates itself; recommendation carousels and history-based
-surfaces are prohibited; every candidate's provenance is logged as
-`search#<rank>`, making compliance auditable from the trace.
+**Layer 2 — targeted block + measured provenance (agent side, updated
+2026-07-23):** the agent shops the full site like the human — anything
+less would make the process comparison an artifact and forbid the agent
+from encountering the choice architecture the study wants to observe.
+Only browsing-history-derived modules ("Previously viewed", "Inspired by
+your browsing history", "Keep shopping for") are banned — empty anyway
+when Layer 1's pause works; the ban is the failsafe — plus search-box
+autosuggest. Every candidate's provenance is logged in its CAND line
+(`search#rank`, `carousel:<name>`, `buy_again`, `product_page_link`,
+`category_page`), turning surface reliance into a measured variable.
 
 **Layer 3 — measure:** the packer computes a per-participant
 **contamination index** into the manifest — overlap between agent picks
@@ -250,20 +372,88 @@ estimable quantity. Statistical commitment, stated in advance: "no
 significant arm difference" is *not* automatically evidence of absence.
 The analysis pre-registers an equivalence margin (e.g. ±10 pp on
 task-level agreement) and uses an equivalence test (TOST) or reports the
-CI on the arm difference — with ~90 participants × 3 tasks per arm,
-adequately powered for margins in that range. The defensible claim is:
+CI on the arm difference — with ~80 participants × 5 tasks per arm,
+adequately powered for margins in that range. The claim this design
+supports is:
 net order effects on outcomes are bounded below the margin, with the two
 dominant channels independently closed by Layers 1–2 and residuals
 measured by Layer 3.
 
 ## 8. Tasks, verdict scale, and deliverables
 
-**Three standardized task frames** (replenishment ≤ ₹600; considered
-purchase ₹1,000–3,000; gift ≤ ₹1,500 for a student-described recipient)
-so results aggregate across the cohort. The gift task is deliberately the
-hardest: it tests whether the twin modeled the student's *social* self,
-and the questionnaire can include a matching stated-preference item as a
-direct benchmark.
+**Task set: five self-purchase categories, configurable as data
+(decision 2026-07-23).** The task structure lives in `tasks_config.csv`
+(id, frame, product type, utilitarian/hedonic category class, budget
+range); pre-flight, packer, human logger, and the cohort report all
+read it, and `tools/make_task_docs.py` regenerates the student
+documents from it — so the task set is a design parameter, not
+hard-coded prose. The operative design is **five self-purchase
+categories drawn from the catalog** (a provisional five ships active —
+sneakers, power bank, backpack, laptop, perfume: sneakers/backpack and
+power bank/perfume are price-matched hedonic/utilitarian pairs, and
+the laptop (₹40,000–1,20,000 — the ceiling deliberately reaches
+MacBooks) is the HIGH-STAKES anchor — a considered durable where a
+wrong agent pick clearly hurts, so twin fidelity is tested along a
+stakes gradient from ₹800 accessory to ₹1.2L laptop. The cohort is
+second-year MBAs in placement season, so the framing is vivid; the
+Apple-vs-Windows choice is itself a clean brand-ecosystem inference
+test, because the agent runs in the lab's Linux container and gets NO
+signal from the student's own device — ecosystem preference must come
+from the questionnaire and the purchase profile (Apple accessories in
+the order history, stated brand items) or it does not come at all.
+The teaching team makes the final pick and re-runs the generator +
+harness.) A gift-for-best-friend fifth category was
+considered and rejected: modeling a third party is a different
+research question, and questionnaire item PR09 (which asks the
+student to describe that exact gift) would have handed the persona
+run the answer verbatim while the ablated run had nothing — a
+confounded contrast, not a grounding test. The earlier replenishment and gift frames
+are retired from the active set: this experiment estimates how well a
+twin buys FOR ITS OWN PERSON; gift buying (modeling a third party) and
+habitual replenishment are different research questions and would
+confound the category contrast. With five categories spanning both
+classes, the utilitarian-vs-hedonic fidelity contrast is a
+within-student estimate. (Instrument note: predictive item PR09 was
+authored as the gift task's stated-preference benchmark; with no gift
+task it stays a general stated-preference item — swap or keep at
+instrument freeze, teaching-team call.)
+
+**No asking back (autonomy is the treatment).** Both SOULs forbid the
+agent from asking the human anything during a task (the CAPTCHA halt
+is the sole exception): where the grounding files are silent, it must
+note the gap and choose conservatively. A deployed shopping agent
+would ask clarifying questions — that interactive regime is a
+different (and interesting) study; this lab measures the fully
+autonomous twin, so clarification would contaminate the grounding
+contrast (a student's answer mid-run is un-ablatable information).
+The partner protocol matches: partners never answer agent questions,
+and any such exchange is logged as an intervention.
+
+**Task order randomized across students (same decision).** What an
+agent puts in the cart for one category can influence the next (budget
+anchoring, brand momentum, platform state), so shopping order is a
+nuisance variable. Each student gets a randomized task order, derived
+deterministically from their pseudonym (no LMS column, mechanically
+reproducible), which `dtlab-start` enforces by re-ordering the
+sections of tasks.md at pre-flight. The order is held CONSTANT within
+a student — human session and all four agent runs — so every
+within-student contrast (grounding, tier, human-vs-agent) compares
+runs that faced identical task sequences; across students the order is
+random, so position effects cancel at cohort level and are estimable
+(the analyzer reports the late-vs-early position contrast). The packer
+records the executed order and warns when tasks.md was re-sorted by
+hand.
+
+**Process data is machine-parsed (2026-07).** The ECP requires one
+`CAND | task= | asin= | category= | price= | sponsored= | source=`
+line per candidate in the decision log (both SOUL variants), and the
+human-session logger captures the category breadcrumb on every product
+view. The packer parses candidates into the manifest (non-compliance
+is a warning, never a failed pack), which makes the process comparison
+— consideration-set sizes and agent-vs-human search overlap — a
+computed quantity instead of a hand-coding project. This is the same
+enforce-or-measure principle applied to the study's most novel
+dependent variable.
 
 **Verdict scale: `better | identical | equivalent | inferior`** (agent's
 choice relative to the student's own). Superior to a naive
@@ -289,44 +479,78 @@ pack, and the instructor cannot receive one without knowing what's
 missing. Cohort assembly then reduces mostly to concatenating CSVs; only
 citation-fidelity coding touches free text.
 
+**Reproducibility metadata (2026-07).** Each manifest also records which
+twin produced the run: Hermes version, model tier (and model ID where
+capturable), SHA-256 of the exact SOUL.md and of the standardized prompt
+block in tasks.md, kit commit, and image tag. Cheap to collect, and it is
+what lets the cohort analysis rule out version confounds — at N=161 over
+two days, "everyone ran the same twin" must be verifiable, not assumed.
+
 **Why no browser plugin for logging.** An earlier idea. Rejected because
 the three-layer trail already in hand — Hermes session transcripts, the
 mandated agent-written decision log, and screen recording — covers the
 agent side redundantly, and `dtlab-shop`'s Playwright instrumentation
 covers the human side, all inside one codebase with no extension
 distribution, no developer-mode installs, and no third browser-permission
-conversation with 180 students.
+conversation with 161 students.
 
 ## 9. Safety, ethics, and account risk
 
 **Hard boundaries, in the agent's identity file:** add-to-cart only;
 never checkout, addresses, payments, account settings, or subscriptions;
 order-history pages are the only account pages it may open; halt at every
-CAPTCHA. Students remove saved payment methods from the lab browser
-profile; carts are emptied after evidence capture.
+CAPTCHA; per-task effort caps (~10 min / ~12 product pages) so a run can
+never loop unboundedly at N=161. **Prompt-injection hardening (2026-07):**
+the agent reads arbitrary third-party content (listings, reviews, seller
+text), so SOUL.md declares all webpage text data-never-instructions and
+requires logging any listing that appears to address an AI agent —
+which is itself course content for the SOUL walk-through in Session 1.
+Students remove saved payment methods from the lab browser profile —
+now a pre-flight confirm gate in `dtlab-start`, not just a handout line —
+and carts are emptied after evidence capture.
+
+**Secrets and recordings (2026-07 hardening).** The API key is collected
+with hidden input, stored only in a 600-permission `~/.dtlab_env`, and
+never echoed — so it cannot appear in the screen recording; `dtlab-record`
+refuses to start until the student confirms login already happened (no
+passwords/OTPs on screen). The packer runs a content-redaction pass over
+every packed text file (API-key patterns scrubbed; email/phone/"Deliver
+to" markers counted into a `redaction_report` in the manifest) because
+filename-based filtering cannot see inside transcripts. Remote installers
+are pinned by SHA-256 and downloaded-then-verified, never piped to shell;
+the noVNC desktop gets a per-codespace random password and the forwarded
+port must stay Private.
 
 **Research ethics:** course participation and research participation are
 separable — consent covers the pseudonymized questionnaire, the
 purchase-profile extract, the clickstream (with its explicit exclusions),
-and agent logs; a synthetic-persona pack provides a no-questions opt-out
-with no grade impact; pseudonym↔name mapping is held separately by the
-instructor and destroyed post-study; data minimization is implemented in
-code (the pre-flight refuses to launch with PII-shaped files in the
-workspace) rather than promised in prose. Ethics/IRB approval precedes
-the questionnaire.
+agent logs, AND the partner-pairing disclosure (a self-selected classmate
+sees your agent narrate your purchase profile; opt-down to H_FIRST is
+free); a synthetic-persona pack provides a no-questions opt-out with no
+grade impact; pseudonym↔name mapping is held separately by the instructor
+and destroyed post-study; data minimization is implemented in code (the
+pre-flight refuses to launch with PII-shaped files in the workspace; the
+packer redacts keys and flags PII) rather than promised in prose. The
+cohort sits in India: DPDP Act 2023 is the operative regime and BITSoM's
+ethics process (plus the instructor's home IRB where required) precedes
+the questionnaire; GDPR applies only if EU exchange students enroll.
 
 **Account risk, stated plainly in the syllabus:** automated interaction
 sits in tension with Amazon's conditions of use. Mitigations — manual
 login, human-warmed sessions, human-paced actions, add-to-cart only, one
 short run — reduce but do not eliminate the risk of an account being
 flagged; the synthetic-persona path doubles as the zero-risk option, and
-class time is never spent fighting Amazon (pre-decided fallbacks in the
-course plan).
+class time is never spent fighting Amazon. The mid-session flag fallback
+is now specified, not improvised: the student re-runs both sessions
+against the pre-built sandbox store (books.toscrape.com, the smoke-test
+target) with the synthetic persona — graded identically, flagged
+`sandbox`, excluded from the research dataset (see the risk table in
+`COURSE_PLAN_1WEEK.md`).
 
 ## 10. Timeline: why 2 × 3 h + one overnight works
 
 Session 1 is environment + identity (account, codespace, key, smoke test,
-task setup) with a long triage buffer — at N=180, ~10–15 stuck
+task setup) with a long triage buffer — at ~80 per section, ~5–8 stuck
 environments are a planning assumption, not a surprise. The questionnaire
 runs overnight; the instructor's batch tool turns the response sheet into
 per-student persona files in minutes and prints a completion roster for
@@ -362,5 +586,5 @@ data — never merely instructed.** Ordering, blinding, quarantine, verdict
 consistency, citation traceability, and contamination are all in that
 category; where enforcement is impossible (the pause, naturalistic human
 shopping), the design measures instead. That principle is what makes a
-classroom exercise with 180 MBA students simultaneously a publishable
+classroom exercise with 161 MBA students simultaneously a publishable
 paired-choice experiment.

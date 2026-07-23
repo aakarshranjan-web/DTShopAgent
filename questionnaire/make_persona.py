@@ -107,7 +107,7 @@ def main():
         f"Source: {len(items)}-item Digital Twin questionnaire "
         "(dtlab-persona-v1).",
         "Cite item codes verbatim when using these facts in the decision log.",
-        "Likert answers: 1=Strongly disagree ... 5=Strongly agree.",
+        "Likert answers: 1=Disagree strongly ... 5=Agree strongly.",
         "Items marked [CONSTRAINT] are inviolable rules, never preferences.",
         "",
     ]

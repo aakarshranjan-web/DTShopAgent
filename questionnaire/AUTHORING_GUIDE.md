@@ -1,10 +1,26 @@
-# Authoring your 100-item questionnaire
+# The questionnaire instrument — format contract & maintenance
 
-`questionnaire_items.csv` currently contains 6 EXAMPLE rows (codes EX01–EX06).
-**Delete them and paste your own ~100 items in the same format.** Everything
-downstream — the Google Form builder, the persona generator, the agent's
-citation protocol, the research schemas — reads this one file and adapts
-automatically to your codes, constructs, and item count.
+**STATUS: the instrument is authored.** `questionnaire_items.csv` now
+contains the course's real **115 items**, generated from the authoritative
+source document `questionnaire_instrument_source.md` (in this folder): 15
+demographics, 57 validated-scale items (12 published scales, Toubia et al.
+2025 battery), 22 amazon.in shopping-behavior items, 12 values/constraints
+(VC01–VC05 are `constraint=1`), and 9 predictive items. Any change goes
+into the source document FIRST, then is re-transferred to the CSV — the two
+must never diverge. Everything downstream — the Google Form builder, the
+persona generator, the agent's citation protocol (ECP), the research
+schemas — reads the CSV and adapts automatically to codes, constructs, and
+item count.
+
+Three transfer conventions used (recorded so future edits stay
+consistent): block stems are **embedded into each question** (e.g. "I see
+myself as someone who…", "…as a guiding principle in your life?");
+`likert5` anchors are the BFI-style set (Disagree strongly … Agree
+strongly) defined in `build_form.gs`; and **en/em-dashes are flattened to
+plain hyphens** in the CSV (Forms/CSV safety — the content-lockstep test
+normalizes dashes when diffing, so this is the ONLY permitted typographic
+divergence). D10 carries an added "Prefer not to say" option
+(ethics-review decision, 2026-07-22).
 
 ## Column contract (dtlab-persona-v1)
 
@@ -25,14 +41,26 @@ automatically to your codes, constructs, and item count.
 - Keep at least a few stated-preference items that your students' purchase
   histories can contradict; the stated-vs-revealed conflicts are reliably the
   best material in the memos and in the cohort analysis.
-- The item count is not enforced at exactly 100. Set `EXPECTED_ITEMS` at the
-  top of `provisioning/student_start.sh` to your final count so the student
-  pre-flight check validates completeness correctly.
+- The item count lives in ONE place: `DTLAB_EXPECTED_ITEMS` in
+  `dtlab_config.env` at the repo root (currently **115**, matching the
+  instrument), with a matching fallback literal in
+  `provisioning/student_start.sh`. If the instrument changes, update the
+  config (and the fallback) together with the CSV —
+  `tests/test_instrument_lockstep.py` fails on any divergence.
 
-## Workflow after authoring
+## Workflow to build the Form
 
-1. Import your finished CSV into a Google Sheet, tab named `items`.
+0. Run `python3 tests/test_instrument_lockstep.py` — it must pass before
+   you touch Google Forms (row count, code shapes, constraint flags,
+   options discipline, config lockstep, and a full persona-generation
+   round trip through `make_persona.py`).
+1. Import the finished CSV into a Google Sheet, tab named `items`.
 2. Run `buildForm()` from `build_form.gs` (Extensions → Apps Script).
-3. Test-submit once; confirm the linked response Sheet headers carry your
-   `CODE.` prefixes; delete the test row.
-4. Freeze the instrument. Any post-launch edit = a new schema version.
+   Confirm all 115 questions + 16 page breaks were created in one run
+   (Apps Script quotas — a TODO(dry-run) item in `docs/CHANGELOG.md`).
+3. Test-submit once; confirm the linked response Sheet headers carry the
+   `CODE.` prefixes AND spot-check the anchor lists (AC 9-point, RF
+   7-point, TS01 11-point, likert5 wording); delete the test row.
+4. Freeze the instrument at Form build. Any post-launch edit = a new
+   schema version (and a matching edit to
+   `questionnaire_instrument_source.md`), re-checked by step 0.

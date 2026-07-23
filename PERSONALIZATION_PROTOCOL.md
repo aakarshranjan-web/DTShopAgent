@@ -39,9 +39,9 @@ items from view** to clear the existing trail.
 gear icon → **Pause History → 1 day**.
 
 Pausing for 1 day on lab-day morning covers both sessions and
-self-reverses — no cleanup step, nothing left permanently changed on 180
+self-reverses — no cleanup step, nothing left permanently changed on 161
 personal accounts. `dtlab-start` gates on a self-attested confirmation.
-Two caveats for the handout: (a) users have reported the permanent on/off
+Two notes for the handout: (a) users have reported the permanent on/off
 toggle occasionally flipping back on by itself — the pause appears more
 reliable, but students should verify the Browsing History page shows
 paused/empty before proceeding; (b) even paused, this closes the
@@ -49,35 +49,51 @@ BROWSING-driven surfaces (the contamination channel); purchase-driven
 surfaces like "Buy it again" remain, which is the baseline personalization
 we deliberately keep (Issue A).
 
-At setup (T-7, once, before ANY lab session):
-1. amazon.in → Browsing History → **Manage history** → **Remove all items**
-   → toggle **Turn Browsing History OFF**.
-2. Verify the Browsing History page shows empty/off.
+On lab-day morning, once, before EITHER session:
+1. amazon.in → Browsing History → gear icon (**Manage history**) →
+   **Pause History → 1 day** → **Remove all items from view**.
+2. Verify the Browsing History page shows paused/empty.
 
-With browsing history off for BOTH sessions, the "previously viewed" /
+With browsing history paused for BOTH sessions, the "previously viewed" /
 "inspired by browsing" surfaces never populate from the human's session,
 and the two shoppers face symmetric conditions. (Purchase-history-driven
 surfaces like "Buy it again" remain — that's Issue A, wanted.)
-(Gate implemented in `dtlab-start` as described above.) Note honestly: Amazon may still use short-term session signals
+(Gate implemented in `dtlab-start` as described above.) Note: Amazon may still use short-term session signals
 for ranking internally; the toggle removes the visible and strongest
 channel, not necessarily every trace — hence Layers 2 and 3.
 
-### Layer 2 — BLOCK on the agent side (SOUL rule)
+### Layer 2 — TARGETED BLOCK + measured provenance (SOUL rule)
 
-The human must shop naturalistically, so we can't constrain them. The
-agent we can constrain completely. SOUL.md now requires:
-- Candidate sets built ONLY from fresh keyword searches the agent
-  formulates itself from the persona and history files.
-- Never open or use recommendation carousels or history-based surfaces
-  ("Previously viewed", "Buy it again", "Inspired by...", "Customers who
-  viewed...", homepage recommendations).
-- If a search result visibly carries a "previously viewed"-type badge,
-  note it in the decision log and evaluate the product on its merits only.
-- Decision log records, per candidate, its source: `search#<rank>` — so
-  candidate provenance is auditable.
+The human shops naturalistically; the agent shops the whole site the
+same way — anything less would make the human–agent process comparison
+an artifact of an imposed rule, and would forbid the agent from ever
+encountering the platform choice architecture (carousels, badges,
+sponsored placements) the study wants to observe it navigating. The
+distinction that matters is *which* surfaces can carry the human
+session's trace:
 
-This closes the main contamination pathway at the point where it would
-enter the data.
+- **Allowed (item-based or purchase-based — no browsing-session
+  leakage):** keyword search, category pages, product-page links,
+  "Customers who viewed this also viewed", "Frequently bought
+  together", bestseller lists, badges, sponsored results, and "Buy it
+  again" (purchase-driven — the baseline personalization deliberately
+  kept under Issue A).
+- **Banned (browsing-derived — the contamination channel):** "Previously
+  viewed", "Inspired by your browsing history", "Keep shopping for",
+  "Related to items you've viewed". With Layer 1's pause working these
+  modules are empty anyway; the ban is the failsafe for the accounts
+  where the pause silently fails. The agent also ignores search-box
+  autosuggest (which can reflect the account's recent searches) and
+  types queries in full.
+- **Everything is provenance-logged:** each CAND line records where the
+  candidate came from (`search#rank`, `carousel:<name>`, `buy_again`,
+  `product_page_link`, `category_page`), so the agent's reliance on
+  each surface type is a measured variable in the cohort analysis, and
+  any contamination that does slip through arrives with its origin
+  attached.
+
+This closes the browsing-derived pathway structurally while making the
+rest of the choice architecture observable instead of forbidden.
 
 ### Layer 3 — MEASURE what remains (contamination index)
 
@@ -104,60 +120,67 @@ Prefer a gap of a few hours between `dtlab-shop` and the agent run
 to keep the login warm for CAPTCHA purposes. Same day is fine; same
 minute is not ideal.
 
-## What to write in the methods section (pre-drafted honesty)
+## What to write in the methods section (pre-drafted)
 
 "Both shoppers operated within the participant's authentic, long-run
 personalized account environment (ecological validity). Within-experiment
-carry-over from the human session to the agent session was (i) attenuated
-by disabling and clearing Amazon browsing history prior to all sessions,
-(ii) structurally blocked on the agent side by restricting candidate
-generation to de novo keyword search with recommendation surfaces
-prohibited, and (iii) quantified per participant as the overlap between
-agent selections and human-viewed items, which we report and control for."
+carry-over from the human session to the agent sessions was (i) attenuated
+by pausing and clearing Amazon browsing history on every lab day,
+(ii) structurally blocked on the agent side by prohibiting only the
+browsing-history-derived surfaces (all item- and purchase-based surfaces
+remained available, with every candidate's provenance logged), and
+(iii) quantified per participant and per run as the overlap between agent
+selections and human-viewed items, which we report and control for. The
+primary estimands — the questionnaire effect and the model-tier effect —
+are within-participant contrasts across agent runs facing the same
+human-perturbed account, so carry-over common to all runs cancels in
+these comparisons."
 
 
-## Layer 4 — RANDOMIZE the order (counterbalanced arms)
+## Layer 4 — ORDER DESIGN & ASSESSMENT BLINDING (2026-07 design)
 
-The strongest control: randomize students into two arms and estimate the
-order effect instead of arguing about it.
+**All students shop human-first** (Wednesday), committing their picks
+before any agent run; the four agent runs (2×2: persona/ablated ×
+economy/frontier) follow on Thursday and Friday. The order-arm
+counterbalance of earlier drafts is retired: with the primary estimands
+now *within-student contrasts across agent runs* — questionnaire effect
+and model-tier effect — carry-over from the human session is common to
+all four runs and cancels in those contrasts. The absolute human–agent
+agreement level keeps its three safeguards (Layer 1 pause, Layer 2
+targeted block, Layer 3 per-run index as covariate) and is reported with
+that framing.
 
-- **H_FIRST** (human → agent): human uncontaminated; agent faces the
-  human-perturbed account.
-- **A_FIRST** (agent → human): agent uncontaminated; human faces the
-  agent-perturbed account — **valid only with blinding** (below).
+### Assessment blinding: nobody watches their own agent
 
-### The blinding requirement (what makes A_FIRST interpretable)
+Watching your own agent reason its way to a pick anchors the later
+verdicts and satisfaction ratings — sympathy for a visible process is
+not a property of the pick. Protocol, ALL runs, both days: students work
+in self-selected pairs and **swap seats for every agent run**. The
+partner babysits the neighbor's run (CAPTCHA handling needs no account
+knowledge; login happens before the swap), runs `dtlab-cart` after the
+run (automatic cart screenshot + parsed cart contents), and empties the
+cart between runs. Owners first encounter
+their agent's choices as artifacts — picks, logs, screenshots — when
+they write the comparison memo, exactly the evidence a reader of the
+study would have. The pairing doubles as the CAPTCHA-resolution staffing
+and is named in the consent sheet (a classmate sees your purchase
+profile and picks during the runs; pairs are self-selected).
 
-In A_FIRST, if the student watches their agent shop, their subsequent
-"own" picks are directly contaminated by *observation* — a far larger
-channel than platform carry-over, and it would poison the arm. Protocol:
-A_FIRST students work in pairs. Both start their agents, then **swap
-seats**: each babysits the *partner's* run (CAPTCHA-solving needs no
-account knowledge; login happened before the swap). The babysitter — not
-the owner — takes the cart screenshot and empties the cart. Owners see
-nothing of their own agent's choices until after their own shopping is
-done. Enforcement: the arm is recorded in `~/dtlab/arm.txt`, `dtlab-start`
-enforces per-arm ordering, and `dtlab-pack` verifies file timestamps
-against the run marker in the arm-appropriate direction and writes the
-arm into the manifest.
+### Cross-run carry-over (agent → agent)
 
-### What the arm comparison can and cannot show (read before claiming)
+Run N+1 shops an account perturbed by run N. Handled the same way:
 
-1. The two arms do NOT carry the same contamination mechanism: H_FIRST
-   has platform carry-over onto the agent; A_FIRST (blinded) has platform
-   carry-over onto the human. "No difference between arms" therefore
-   means "the NET order effect on outcomes is small," which — combined
-   with Layer 1 (pause) and Layer 2 (agent search-only) closing the main
-   channels — is strong evidence that carry-over does not drive the
-   agreement results. It is not literally "zero contamination in both."
-2. **A non-significant difference is not automatically evidence of
-   absence.** Pre-specify an equivalence margin (e.g. ±10 percentage
-   points on task-level agreement) and run an equivalence test (TOST) or
-   report the confidence interval on the arm difference. With ~90
-   participants × 3 tasks per arm you have reasonable power for margins
-   in that range; a p>.05 from an underpowered comparison proves nothing
-   and a reviewer will say so.
-3. Randomize stratified (e.g. by section), record assignment centrally
-   BEFORE session 2, and treat arm as a design factor in every analysis
-   (it's in every manifest). Bonus: the contamination index should differ
-   by arm in a predictable direction — a built-in manipulation check.
+1. Layer 1 is repeated EVERY lab-day morning (the pause lasts one day —
+   the Friday re-pause is a pre-flight gate, not a suggestion).
+2. Layer 2's browsing-derived ban applies to all runs symmetrically;
+   item-based surfaces do not carry session traces.
+3. **Grounding order is counterbalanced within each day**
+   (P_FIRST/NP_FIRST re-randomized per day on the LMS list), so the
+   persona-vs-ablated contrast is orthogonal to run position.
+4. The model tier is deliberately confounded with day (economy Thursday,
+   frontier Friday — the course's narrative arc). State this in one
+   sentence in the methods; the within-day run-order estimate from the
+   counterbalanced grounding order bounds the plausible size of
+   day-order effects.
+5. The contamination index is computed per run, so residual carry-over
+   is a covariate at run granularity.

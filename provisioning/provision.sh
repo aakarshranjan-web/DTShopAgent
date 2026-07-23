@@ -1,48 +1,106 @@
 #!/usr/bin/env bash
-# provision.sh — Build the golden VM image for the Digital Twin lab.
-# Run ONCE by the instructor on a clean Ubuntu 24.04 Desktop VM, then snapshot
-# and export the VM (e.g. as .ova) for distribution. Students never run this.
+# provision.sh — Build the golden VM image for the Digital Twin lab
+# (FALLBACK route; Codespaces via .devcontainer/ is primary, see
+# COURSE_PLAN_1WEEK.md). Run ONCE by the instructor on a clean Ubuntu 24.04
+# Desktop VM, then snapshot and export. Students never run this.
 #
 # After provisioning, a student only needs to:
 #   1. Import the VM, log in (student / <course password>)
 #   2. Paste their Claude API key when prompted by student_start.sh
-#   3. Drop persona_survey.md + purchase_history.csv into ~/dtlab/workspace
-#   4. Run: dtlab-start
+#   3. Drop persona_survey.md (from make_persona.py) into ~/dtlab/workspace
+#      (purchase_profile.md is written by the agent itself at Bootstrap)
+#   4. Run: dtlab-shop, then dtlab-start
 set -euo pipefail
+KIT="$(cd "$(dirname "$0")/.." && pwd)"   # repo root = the dt-lab kit
 
-echo "== [1/6] System packages =="
+# ---- pinned downloads -------------------------------------------------
+# Every remote installer is downloaded to a file, checksum-verified, then
+# executed. "UNPINNED" makes the build FAIL until the TA pins a release
+# (procedure: TA_ONBOARDING.md > "Updating installer pins").
+# TODO(dry-run): pin real versions + checksums at image-build time.
+UV_INSTALLER_URL="https://astral.sh/uv/install.sh"
+UV_INSTALLER_SHA256="UNPINNED"
+HERMES_INSTALLER_URL="https://hermes-agent.nousresearch.com/install.sh"
+HERMES_INSTALLER_SHA256="UNPINNED"
+PLAYWRIGHT_PIN=""   # e.g. "==1.55.0"; empty = latest (pin at dry run)
+
+fetch_verified() {  # url sha256 dest
+  local url="$1" sha="$2" dest="$3"
+  if [ "$sha" = "UNPINNED" ] && [ "${DTLAB_ALLOW_UNPINNED:-0}" != "1" ]; then
+    echo "ERROR: $url has no pinned SHA-256."
+    echo "Pin it first (TA_ONBOARDING.md > Updating installer pins), or"
+    echo "export DTLAB_ALLOW_UNPINNED=1 for a throwaway test build."
+    exit 1
+  fi
+  curl -fsSL "$url" -o "$dest"
+  if [ "$sha" != "UNPINNED" ]; then
+    echo "$sha  $dest" | sha256sum -c - || {
+      echo "ERROR: checksum mismatch for $url — a new release or tampering."
+      echo "Do NOT bypass; re-pin per TA_ONBOARDING.md and re-run."
+      exit 1
+    }
+  else
+    echo "WARNING: running UNPINNED installer from $url (test build only)."
+  fi
+}
+
+echo "== [1/7] System packages =="
 sudo apt-get update
 sudo apt-get install -y git curl python3 python3-pip python3-venv \
     ffmpeg chromium-browser jq unzip
 
-echo "== [2/6] uv + Playwright (for the capture scripts) =="
-curl -LsSf https://astral.sh/uv/install.sh | sh
+echo "== [2/7] uv + Playwright (for the capture scripts) =="
+fetch_verified "$UV_INSTALLER_URL" "$UV_INSTALLER_SHA256" /tmp/uv-install.sh
+sh /tmp/uv-install.sh && rm -f /tmp/uv-install.sh
 export PATH="$HOME/.local/bin:$PATH"
-uv venv "$HOME/dtlab/.venv"
-"$HOME/dtlab/.venv/bin/pip" install playwright
+uv venv --seed "$HOME/dtlab/.venv"        # --seed: venv WITH pip
+"$HOME/dtlab/.venv/bin/pip" install "playwright$PLAYWRIGHT_PIN"
 "$HOME/dtlab/.venv/bin/playwright" install chromium
 
-echo "== [3/6] Hermes Agent =="
-# Official Nous Research installer (verify URL against current docs at build time)
-curl -fsSL https://hermes-agent.nousresearch.com/install.sh | bash
+echo "== [3/7] Hermes Agent =="
+fetch_verified "$HERMES_INSTALLER_URL" "$HERMES_INSTALLER_SHA256" \
+    /tmp/hermes-install.sh
+bash /tmp/hermes-install.sh && rm -f /tmp/hermes-install.sh
 
-echo "== [4/6] Lab directory layout =="
+echo "== [4/7] Lab directory layout =="
 mkdir -p "$HOME/dtlab/workspace" "$HOME/dtlab/evidence" "$HOME/dtlab/tools"
-# Kit files are expected alongside this script when building the image:
-cp -v ../agent/SOUL.md              "$HOME/dtlab/workspace/SOUL.md"
-cp -v ../data-pipeline/*.py         "$HOME/dtlab/tools/"
-cp -v ../questionnaire/make_persona.py "$HOME/dtlab/tools/"
-cp -v student_start.sh              "$HOME/dtlab/tools/"
-cp -v ../tools/pack_evidence.py     "$HOME/dtlab/tools/"
-# Templates land directly in the workspace; students fill them in place.
-cp -v ../templates/tasks.md         "$HOME/dtlab/workspace/tasks.md"
+cp -v "$KIT/agent/SOUL.md"                 "$HOME/dtlab/workspace/SOUL.md"
+# kit-owned SOUL variants for the optional ablation factor (dtlab-start
+# swaps the workspace SOUL.md per condition when the factor is enabled)
+mkdir -p "$HOME/dtlab/soul"
+cp -v "$KIT/agent/SOUL.md" "$KIT/agent/SOUL_ablated.md" \
+      "$KIT/agent/SOUL_sandbox.md" "$HOME/dtlab/soul/"
+cp -v "$KIT/templates/comparison_ablation.md" \
+      "$HOME/dtlab/comparison_ablation.TEMPLATE.md"
+cp -v "$KIT/dtlab_config.env"              "$HOME/dtlab/dtlab_config.env"
+cp -v "$KIT/tasks_config.csv"              "$HOME/dtlab/tasks_config.csv"
+mkdir -p "$HOME/dtlab/assets"
+cp -v "$KIT/assets/ringelai.png"           "$HOME/dtlab/assets/" 2>/dev/null || true
+cp -v "$KIT/data-pipeline/"*.py            "$HOME/dtlab/tools/"
+cp -v "$KIT/questionnaire/make_persona.py" "$HOME/dtlab/tools/"
+cp -v "$KIT/provisioning/student_start.sh" "$HOME/dtlab/tools/"
+cp -v "$KIT/tools/pack_evidence.py"        "$HOME/dtlab/tools/"
+cp -v "$KIT/tools/log_human_session.py"    "$HOME/dtlab/tools/"
+cp -v "$KIT/tools/capture_cart.py"         "$HOME/dtlab/tools/"
+cp -v "$KIT/tools/capture_verdicts.py"     "$HOME/dtlab/tools/"
+cp -v "$KIT/tools/dtlab_browser.sh"        "$HOME/dtlab/tools/"
+# Templates land in the workspace ONCE; students fill them in place, so a
+# re-run must never clobber them.
+[ -f "$HOME/dtlab/workspace/tasks.md" ] || \
+  cp -v "$KIT/templates/tasks.md"          "$HOME/dtlab/workspace/tasks.md"
+[ -f "$HOME/dtlab/workspace/comparison.md" ] || \
+  cp -v "$KIT/templates/comparison.md"     "$HOME/dtlab/workspace/comparison.md"
 mkdir -p "$HOME/dtlab/human"
-cp -v ../templates/human_picks.csv  "$HOME/dtlab/human/human_picks.TEMPLATE.csv"  # manual fallback only
-cp -v ../tools/log_human_session.py "$HOME/dtlab/tools/"
-cp -v ../templates/comparison.md    "$HOME/dtlab/workspace/comparison.md"
-chmod +x "$HOME/dtlab/tools/"*.sh
+cp -v "$KIT/templates/human_picks.csv" \
+      "$HOME/dtlab/human/human_picks.TEMPLATE.csv"  # manual fallback only
+find "$HOME/dtlab/tools" -name '*.sh' -exec chmod +x {} +
 
-echo "== [5/6] Convenience commands =="
+echo "== [5/7] Kit version stamp (reproducibility metadata) =="
+printf 'commit=%s built=%s route=vm\n' \
+  "$(git -C "$KIT" rev-parse --short HEAD 2>/dev/null || echo unknown)" \
+  "$(date -u +%Y-%m-%dT%H:%MZ)" > "$HOME/dtlab/kit_version.txt"
+
+echo "== [6/7] Convenience commands =="
 mkdir -p "$HOME/.local/bin"
 cat > "$HOME/.local/bin/dtlab-start" <<'EOF'
 #!/usr/bin/env bash
@@ -51,6 +109,13 @@ EOF
 cat > "$HOME/.local/bin/dtlab-record" <<'EOF'
 #!/usr/bin/env bash
 # Screen-record the full desktop until Ctrl+C; saves to evidence folder.
+echo "=============================================================="
+echo " RECORDING HYGIENE: log into amazon.in BEFORE starting this"
+echo " recording. NEVER type passwords, OTPs, or API keys while the"
+echo " recorder runs — everything on screen ends up in the video."
+echo "=============================================================="
+read -rp "Logged in already, nothing sensitive on screen? [y/N] " OKGO
+case "$OKGO" in [yY]*) ;; *) echo "Aborted — log in first."; exit 1 ;; esac
 OUT="$HOME/dtlab/evidence/run_$(date +%Y%m%d_%H%M%S).mkv"
 echo "Recording to $OUT — press Ctrl+C in this terminal to stop."
 ffmpeg -f x11grab -framerate 12 -i "$DISPLAY" -c:v libx264 -preset veryfast \
@@ -62,13 +127,26 @@ exec python3 "$HOME/dtlab/tools/pack_evidence.py" "$@"
 EOF2
 cat > "$HOME/.local/bin/dtlab-shop" <<'EOF2'
 #!/usr/bin/env bash
-# Step that comes FIRST: your own logged shopping session + pick confirmation.
+# Step that comes FIRST (all students are human-first): your own logged
+# shopping session.
 exec "$HOME/dtlab/.venv/bin/python" "$HOME/dtlab/tools/log_human_session.py" "$@"
 EOF2
+cat > "$HOME/.local/bin/dtlab-cart" <<'EOF2'
+#!/usr/bin/env bash
+# Run by the PARTNER after each agent run: cart screenshot + parsed cart
+# contents (cross-checked against the agent's picks at pack time).
+exec "$HOME/dtlab/.venv/bin/python" "$HOME/dtlab/tools/capture_cart.py" "$@"
+EOF2
+cat > "$HOME/.local/bin/dtlab-verdict" <<'EOF2'
+#!/usr/bin/env bash
+# Guided verdict/rating/rationale capture after each day's runs.
+exec python3 "$HOME/dtlab/tools/capture_verdicts.py" "$@"
+EOF2
 chmod +x "$HOME/.local/bin/dtlab-start" "$HOME/.local/bin/dtlab-record" \
-         "$HOME/.local/bin/dtlab-pack" "$HOME/.local/bin/dtlab-shop"
+         "$HOME/.local/bin/dtlab-pack" "$HOME/.local/bin/dtlab-shop" \
+         "$HOME/.local/bin/dtlab-cart" "$HOME/.local/bin/dtlab-verdict"
 
-echo "== [6/6] Done =="
+echo "== [7/7] Done =="
 echo "Now configure Hermes ONCE interactively so setup screens are cached:"
 echo "  hermes setup    (choose Anthropic as provider; leave API key BLANK —"
 echo "                   students insert their own via dtlab-start)"

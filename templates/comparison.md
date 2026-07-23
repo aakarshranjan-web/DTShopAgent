@@ -1,49 +1,72 @@
 # Comparison & assessment — participant {STUDENT_ID}
 
-<!-- Fill one block per task AFTER the agent run. The "Verdict:" line must
-     contain exactly one of the four values below (machine-parsed for the
-     cohort dataset — do not rephrase, do not add words):
-
-       better     = the agent's choice is BETTER for me than my own pick
-       identical  = the agent chose the SAME product (same ASIN) as I did
-       equivalent = a DIFFERENT product, but an equally good fit for me
-       inferior   = the agent's choice is WORSE for me than my own pick
-
-     Note "identical" is claimed automatically by matching ASINs — if the
-     ASINs differ, choose among better/equivalent/inferior and justify. -->
+<!-- GENERATED from tasks_config.csv by tools/make_task_docs.py.
+     Verdict values: better | identical | equivalent | inferior (your
+     agent's pick relative to YOUR OWN pick; 'identical' is
+     ASIN-verified). Ratings: how satisfied would you be OWNING each
+     pick, 1-10, whole numbers. Machine-parsed — do not rephrase. -->
 
 ## Task 1
 Verdict: {better|identical|equivalent|inferior}
 My pick: {title} | Agent pick: {title}
-Attribution — which item codes did the agent's decision log cite, and were
-those citations real (traceable to my persona/history) or confabulated?
+My pick rating (1-10): {N}
+Agent pick rating (1-10): {N}
+Attribution — which evidence did the decision log cite, and was it real
+or confabulated?
 {...}
-Mechanism — where we diverged, was it missing info about me, wrong weighting,
-platform choice architecture (ranking/sponsored/badges), or a taste dimension
-the questionnaire never captured?
+Mechanism — where we diverged, why?
 {...}
 
 ## Task 2
 Verdict: {better|identical|equivalent|inferior}
 My pick: {title} | Agent pick: {title}
-Attribution: {...}
-Mechanism: {...}
+My pick rating (1-10): {N}
+Agent pick rating (1-10): {N}
+Attribution — which evidence did the decision log cite, and was it real
+or confabulated?
+{...}
+Mechanism — where we diverged, why?
+{...}
 
 ## Task 3
 Verdict: {better|identical|equivalent|inferior}
 My pick: {title} | Agent pick: {title}
-Attribution: {...}
-Mechanism — specifically: what does the agent's gift choice reveal about how
-it modeled me (vs. the recipient)?
+My pick rating (1-10): {N}
+Agent pick rating (1-10): {N}
+Attribution — which evidence did the decision log cite, and was it real
+or confabulated?
+{...}
+Mechanism — where we diverged, why?
+{...}
+
+## Task 4
+Verdict: {better|identical|equivalent|inferior}
+My pick: {title} | Agent pick: {title}
+My pick rating (1-10): {N}
+Agent pick rating (1-10): {N}
+Attribution — which evidence did the decision log cite, and was it real
+or confabulated?
+{...}
+Mechanism — where we diverged, why?
+{...}
+
+## Task 5
+Verdict: {better|identical|equivalent|inferior}
+My pick: {title} | Agent pick: {title}
+My pick rating (1-10): {N}
+Agent pick rating (1-10): {N}
+Attribution — which evidence did the decision log cite, and was it real
+or confabulated?
+{...}
+Mechanism — where we diverged, why?
 {...}
 
 ## Overall (answer all four)
-1. Stated vs revealed: when my survey answers and purchase history conflicted,
-   which did the agent follow — and which SHOULD it have followed?
+1. Stated vs revealed: when my survey answers and purchase history
+   conflicted, which did the agent follow — and which SHOULD it have?
 {...}
-2. Platform power: roughly what share of the agent's candidate sets came from
-   first-page / sponsored results? Who is the advertiser's audience if agents
-   shop?
+2. Platform power: roughly what share of the agent's candidate sets came
+   from first-page / sponsored results?
 {...}
 3. Delegation: would I give this twin real spending authority with a cap?
    For which categories?

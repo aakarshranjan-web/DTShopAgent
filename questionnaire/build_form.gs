@@ -3,8 +3,9 @@
  * Form from questionnaire_items.csv, with responses collected in a Sheet.
  *
  * SETUP (once, ~5 minutes):
- *  0. Author your own items first — see AUTHORING_GUIDE.md. The shipped CSV
- *     contains only EXAMPLE rows (EX01–EX06) that must be replaced.
+ *  0. The shipped CSV holds the real 115-item instrument (generated from
+ *     questionnaire_instrument_source.md — see AUTHORING_GUIDE.md). The
+ *     EX0x guard below only protects against accidental reversion.
  *  1. Create a new Google Sheet. File > Import > Upload questionnaire_items.csv
  *     (replace spreadsheet; keep the header row). Name the tab "items".
  *  2. Extensions > Apps Script. Paste this file. Run buildForm(). Authorize.
@@ -18,8 +19,11 @@
  * and each student's row is exported to their VM via make_persona.py.
  */
 
-var LIKERT5 = ['1 - Strongly disagree', '2 - Disagree', '3 - Neutral',
-               '4 - Agree', '5 - Strongly agree'];
+// Anchors follow the instrument source (questionnaire_instrument_source.md
+// §2, BFI-style): keep in lockstep with the header note in make_persona.py.
+var LIKERT5 = ['1 - Disagree strongly', '2 - Disagree a little',
+               '3 - Neither agree nor disagree', '4 - Agree a little',
+               '5 - Agree strongly'];
 
 function buildForm() {
   var sheet = SpreadsheetApp.getActive().getSheetByName('items');
@@ -39,12 +43,14 @@ function buildForm() {
                             ' items)');
   form.setDescription(
     'Answer honestly as yourself, not aspirationally — your agent will only ' +
-    'be as accurate as these answers. Takes ~25 minutes. Your responses are ' +
+    'be as accurate as these answers. Takes ~30 minutes. Your responses are ' +
     'stored under your course pseudonym; see the research information sheet ' +
     'for data handling and opt-out.');
   form.setProgressBar(true);
 
-  // Pseudonym ID (validated pattern DT2026-###)
+  // Pseudonym ID (validated pattern DT2026-###). Apps Script cannot read
+  // dtlab_config.env — keep this pattern in sync with DTLAB_ID_PATTERN by
+  // hand (tests/test_instrument_lockstep.py cross-checks the two).
   var idItem = form.addTextItem()
       .setTitle('Your course-issued participant ID (e.g. DT2026-042)')
       .setRequired(true);

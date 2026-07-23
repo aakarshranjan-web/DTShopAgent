@@ -28,7 +28,20 @@ HERE = Path(__file__).resolve().parent
 MAKE_PERSONA = HERE.parent / "questionnaire" / "make_persona.py"
 if not MAKE_PERSONA.exists():                       # tools/ layout on the VM
     MAKE_PERSONA = HERE / "make_persona.py"
-ID_RE = re.compile(r"DT\d{4}-\d{3}")
+
+
+def _load_id_pattern():
+    """Shared ID pattern from dtlab_config.env (repo root or ~/dtlab)."""
+    for p in (HERE.parent / "dtlab_config.env",
+              Path.home() / "dtlab" / "dtlab_config.env"):
+        if p.exists():
+            for line in p.read_text(encoding="utf-8").splitlines():
+                if line.strip().startswith("DTLAB_ID_PATTERN="):
+                    return line.split("=", 1)[1].strip().strip("'\"")
+    return r"DT[0-9]{4}-[0-9]{3}"
+
+
+ID_RE = re.compile(_load_id_pattern())
 
 
 def main():
@@ -38,6 +51,10 @@ def main():
     ap.add_argument("--outdir", default="cohort_personas")
     ap.add_argument("--zip", action="store_true",
                     help="also write one <ID>.zip per student")
+    ap.add_argument("--strip-email", action="store_true",
+                    help="also write <outdir>/responses_research.csv with "
+                         "every email column removed (the research copy "
+                         "required by research_protocol.md §2)")
     args = ap.parse_args()
 
     with open(args.responses, newline="", encoding="utf-8-sig") as f:
@@ -87,6 +104,27 @@ def main():
     print("\nRoster check: compare the ID list above against your class "
           "list to chase missing questionnaire submissions before "
           "session 2.")
+
+    # Email hygiene (research_protocol.md §2): the raw Form export contains
+    # institutional emails; the research copy must not.
+    if args.strip_email:
+        with open(args.responses, newline="", encoding="utf-8-sig") as f:
+            reader = csv.reader(f)
+            header = next(reader)
+            keep = [i for i, h in enumerate(header)
+                    if "email" not in h.lower()]
+            research = outdir / "responses_research.csv"
+            with open(research, "w", newline="", encoding="utf-8") as out:
+                w = csv.writer(out)
+                w.writerow([header[i] for i in keep])
+                for row in reader:
+                    w.writerow([row[i] for i in keep if i < len(row)])
+        print(f"\nWrote email-stripped research copy -> {research}")
+    else:
+        print("\nREMINDER: responses.csv contains institutional emails. "
+              "The research copy must have the email column deleted "
+              "(research_protocol.md §2) — re-run with --strip-email to "
+              "generate it automatically.")
 
 
 if __name__ == "__main__":

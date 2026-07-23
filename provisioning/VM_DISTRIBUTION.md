@@ -1,5 +1,13 @@
 # VM distribution — which hypervisor, and the pre-built rollout
 
+> **STATUS: FALLBACK / ARCHIVE.** The operative infrastructure decision
+> lives in `COURSE_PLAN_1WEEK.md` (single authority): **GitHub Codespaces
+> on free personal accounts is primary**, confirmed by the instructor dry
+> run. This document is kept for the fallback case — students whose
+> amazon.in accounts fight datacenter IPs, or a failed dry run inverting
+> the route. The "Route decision (updated)" section further down predates
+> that decision and is superseded.
+
 ## The short answer
 
 There is no single free hypervisor that covers a modern MBA cohort with one
@@ -57,16 +65,17 @@ The manual-install route (`provision.sh` on their own machine) remains
 documented for the handful of students who want it, but it is optional and
 unsupported in office hours — the image is the paved road.
 
-## Route decision (updated)
+## Route decision (SUPERSEDED — see banner at top)
 
-With GitHub Classroom off the table and datacenter-IP CAPTCHA friction
-confirmed as a real cost, **local VMs are the primary route** and the
-Codespaces config (`.devcontainer/` at the repo root) was temporarily demoted to a fallback for students whose
-laptops cannot run a VM. Note that the human-first protocol (dtlab-shop
-before the agent) is itself the main CAPTCHA mitigation on ANY route: the
-agent inherits a session warmed by genuine human shopping, on the student's
-account, minutes earlier — on a local VM that session also carries a
-residential IP, which is why local-first wins.
+An earlier revision made local VMs primary. That decision is superseded:
+`COURSE_PLAN_1WEEK.md` is the single authority and puts **Codespaces
+primary, VMs fallback**, with the instructor dry run (T-21) as the
+empirical check. The still-valid observation from that era: the
+human-first protocol (dtlab-shop before the agent) is the main CAPTCHA
+mitigation on ANY route — the agent inherits a session warmed by genuine
+human shopping minutes earlier; on a local VM that session additionally
+carries a residential IP, which is what makes VMs the natural fallback
+for CAPTCHA-flagged accounts.
 
 ## "How do we KNOW the local VMs will work?" — the testing funnel
 

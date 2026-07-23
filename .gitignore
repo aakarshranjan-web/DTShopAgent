@@ -1,11 +1,18 @@
-# Python
+# ---- Python ----
 __pycache__/
 *.pyc
 .venv/
+.ruff_cache/
 
-# Student / research data — NEVER commit
+# ---- Student / research data — NEVER commit ----
+# (these patterns describe runtime artifacts on the lab machines; kit
+# templates that share a name are explicitly re-included below)
 responses.csv
+responses_research.csv
 cohort_personas/
+cohort_orders.csv
+cohort_choices.csv
+cohort_report.html
 *_evidence.zip
 evidence/
 human/
@@ -17,13 +24,20 @@ human_session.jsonl
 human_picks.csv
 decision_log.md
 agent_picks.csv
+tier.txt
+arm.txt
+persona_order.txt
 
-# Secrets
+# kit files that must STAY tracked despite the data patterns above
+!templates/human_picks.csv
+
+# ---- Secrets ----
 .env
+.dtlab_env
 *api_key*
 *.pem
 
-# Local artifacts
+# ---- Local artifacts ----
 scrape_errors.log
 *.ova
 *.utm

@@ -1,62 +1,268 @@
 # TA onboarding — Digital Twin Shopping Agent Lab
 
-Welcome. This repo is the complete kit for the 1-week, 180-student
-digital-twin experiment (Hermes Agent + Claude API + amazon.in).
+Welcome. This repo is the complete kit for the 1-week, 161-student
+(two sections: 80 mornings + 81 afternoons, 3h/day for 5 days)
+digital-twin experiment (Hermes Agent + Claude API + amazon.in). It
+serves three audiences from one commit — see README > "Who uses what"
+for the role map (students: four commands, ignore the repo; you: this
+file; instructor: design docs + analysis).
 
 ## Read in this order (30 minutes)
 1. `COURSE_PLAN_1WEEK.md` — THE operative plan (2×3h sessions, two arms).
 2. `README.md` — file map + the seven deliverables and how each is captured.
 3. `agent/SOUL.md` — the agent's identity, Bootstrap (it reads the user's
-   amazon.in order history itself), logging protocol, hard boundaries.
+   amazon.in order history itself), the ECP logging protocol (incl. the
+   machine-parsed `CAND |` candidate lines), hard boundaries. Then skim
+   `agent/SOUL_ablated.md` — the questionnaire-free variant used by the
+   optional ablation factor; the two must stay in lockstep on
+   boundaries and logging format.
 4. `PERSONALIZATION_PROTOCOL.md` — the contamination model: pause
-   Browsing History (Layer 1), agent search-only (2), measured index (3),
-   counterbalanced blinded arms (4).
+   Browsing History daily (Layer 1), targeted block + provenance-logged
+   candidates (2), measured index per run (3), order design + assessment
+   blinding via partner swaps (4).
 5. `research_protocol.md` — schemas, pseudonyms, consent, dataset assembly.
-6. `questionnaire/AUTHORING_GUIDE.md` — instrument format (prof supplies
-   the 100 items; the shipped CSV holds EX0x placeholders that HARD-FAIL
-   all downstream tools until replaced).
+6. `questionnaire/questionnaire_instrument_source.md` — the AUTHORITATIVE
+   instrument: 115 items, the design decisions behind them (ECP, model
+   policy, evaluation logic, deliberate exclusions), and the APA
+   references for every validated scale.
+7. `questionnaire/AUTHORING_GUIDE.md` — the CSV format contract and the
+   transfer conventions (embedded stems, likert5 anchors, constraint
+   flags). The CSV now holds the real 115 items; source doc and CSV must
+   never diverge.
+8. `dtlab_config.env` + `tasks_config.csv` (repo root, 3 minutes) — the
+   shared constants (item count, ID pattern, browser profile, CDP port,
+   the two optional-factor switches) and the task structure (ids,
+   product types, utilitarian/hedonic classes, budgets). Change values
+   THERE, nowhere else; the lockstep test and the packer catch drift.
+9. `docs/CHANGELOG.md` — the **live T-21 dry-run list** (top of the
+   file) plus the record of everything the hardening and four-run
+   passes changed.
 
 ## The student-facing surface (all of it)
 Four commands inside a Codespace built from this repo:
-`dtlab-shop` (logged own shopping) · `dtlab-start` (pre-flight + agent) ·
-`dtlab-record` (screen capture) · `dtlab-pack` (validated submission zip).
+`dtlab-shop` (logged own shopping, Wednesday — picks committed before
+any agent run) · `dtlab-start` (pre-flight + agent; run once per agent
+run — four total across Thursday/Friday, it announces which run and
+which condition, swaps the workspace state itself, and walks crash
+recovery) · `dtlab-cart` (run by the PARTNER after each agent run: automatic cart
+screenshot + parsed cart contents, cross-checked against the agent's
+picks at pack time) · `dtlab-verdict` (guided verdict/rating/rationale
+capture — structured, no markdown editing) · `dtlab-record` (screen
+capture, optional) · `dtlab-pack` (validated submission zip, Friday,
+uploaded via the BITSoM LMS assignment). Human-first ordering is
+enforced by the pre-flight (hard gate: no agent run without
+`dtlab-shop`'s files) and the packer — students cannot get the order
+wrong silently. During every agent run students swap seats with their partner
+(assessment blinding + CAPTCHA handling; PERSONALIZATION_PROTOCOL.md
+Layer 4).
+
+## How the kit defends itself (know this before you touch anything)
+
+Every claim the experiment must defend is enforced by code or measured as
+data (`docs/design_rationale.md` §11 closes on this principle). The
+concrete machinery, so you recognize it when you see it:
+
+- **Quarantine + ordering:** `~/dtlab/human/` is agent-barred (SOUL.md
+  boundary + pre-flight + packer check); arm ordering is verified against
+  file timestamps at packing.
+- **Verdict integrity:** `comparison.md` verdicts are parsed per task
+  section and cross-checked against the two picks files' ASINs.
+- **Secrets:** the API key is collected hidden, lives only in a
+  600-permission `~/.dtlab_env`, and `dtlab-pack` content-redacts key
+  patterns from every packed text file (see `redaction_report` in each
+  manifest — skim it when grading).
+- **Supply chain:** installers are checksum-pinned; builds refuse to run
+  unpinned (section below).
+- **Agent containment:** add-to-cart only, amazon.in only, CAPTCHA halt,
+  per-task effort caps, and webpage-text-is-never-instructions (prompt
+  injection). Read the Hard boundaries block of `agent/SOUL.md` verbatim
+  — it is also Session-1 teaching content.
+- **Ablation integrity:** an ablated run's persona files are physically
+  absent, each run's log is archived before the next run starts, and
+  the packer's manipulation check fails any ablated log (either day)
+  that cites persona item codes. Per-run condition + tier land in the
+  manifest; `dtlab-cart`'s parsed cart JSON is cross-checked against
+  the agent's self-reported picks (`cart_verified` per run).
+- **Issues vs warnings:** the packer HARD-FAILS on anything the student
+  can fix (missing files, placeholder verdicts, bad ASINs — exit
+  non-zero with a fix list) and records the rest as non-blocking
+  `warnings` in the manifest (e.g. an agent that ignored the `CAND |`
+  format). Read both fields when grading.
+- **Regression net:** `tests/simulate_submission.sh` (sandboxed — it
+  cannot touch real data) + `tests/test_start_flow.sh` (scripted walk
+  of the four-run state machine) + `tests/test_instrument_lockstep.py`
+  + `tests/test_analyze_cohort.py` + CI on every push. If you change
+  anything the tests cover, the tests tell you.
 
 ## Your open work items (rough priority order)
+- [x] ~~Transfer the instrument into `questionnaire_items.csv`~~ — DONE
+      (2026-07-22): 115 items generated from
+      `questionnaire_instrument_source.md`; item count now lives in
+      `dtlab_config.env` (`DTLAB_EXPECTED_ITEMS=115`, with a matching
+      fallback in `provisioning/student_start.sh`); anti-stereotyping
+      line added to `agent/SOUL.md` (ECP). Remaining instrument work is
+      verification, not authoring.
+- [ ] **Verify the CSV against the source doc** item-by-item (codes,
+      wording, options, constraint flags on VC01–VC05 only), then build
+      the Form via `build_form.gs`, test-submit once, and spot-check the
+      anchor lists in the live Form: likert5 = "Disagree strongly …
+      Agree strongly", AC 9-point, RF 7-point, TS01 11-point. Delete the
+      test row. **Freeze the instrument at Form build** — any later
+      change = new schema version + matching source-doc edit.
+- [x] ~~Model-tier decision~~ — DECIDED (2026-07-23): tier is
+      within-student by day (economy Thursday, frontier Friday), part of
+      the four-run 2×2. Per-run tier capture ships with the 4-run
+      tooling (docs/WORK_ORDER_4RUN.md).
+- [ ] **Finalize the FIVE categories with the professor.** The design
+      is five self-purchase categories from the **10-category catalog**
+      in `tasks_config.csv` (rationale and sources in
+      `docs/TASK_CATEGORIES_10.md`); a provisional five is active
+      (sneakers, power bank, backpack, laptop, perfume). To change
+      the selection: `#`-out the rows you drop, remove the `#` from the
+      rows you keep, renumber task_id 1..N, run
+      `python3 tools/make_task_docs.py`, re-run the harness, freeze
+      alongside the questionnaire. No gift and no replenishment framing
+      (out of scope by design — see design_rationale §8); task order is
+      randomized per student automatically, nothing to assign. Note:
+      questionnaire item PR09 was authored as the gift benchmark —
+      decide at instrument freeze whether to keep or replace it. During
+      the dry run also verify the agent complies with the `CAND |` line
+      format, that breadcrumb capture works on live product pages, and
+      that a 5-task agent run FITS the session slot (SOUL caps ~10
+      min/task; tighten the cap if it brushes the hour — the laptop
+      task, the deliberate high-stakes anchor, is the likeliest to hit
+      the cap on both the human and agent side; time it explicitly).
+- [ ] **HED/UT manipulation check (measure, don't assert).** The
+      utilitarian/hedonic class of each task is a design variable — so
+      measure it for THIS cohort: add the Voss, Spangenberg & Grohmann
+      (2003) 10-item HED/UT semantic differential for the chosen task
+      categories (a ~2-minute add-on to the questionnaire, or an
+      in-class poll) and report per-category HED/UT scores alongside the
+      category-class analysis. This matters most for the two categories
+      that carry both functional and style attributes (backpack,
+      sneakers) — the cohort's own scores are the classification of
+      record. See `docs/TASK_CATEGORIES_10.md` for the scale reference.
+- [ ] **Token/cost benchmark across model tiers (during the dry run).**
+      Run at least one full single-category task end-to-end under each
+      of four configurations — **Haiku-class with and without extended
+      thinking, Sonnet-class with and without extended thinking** — and
+      repeat over 2–3 different categories so the numbers average out.
+      Record per run: input/output/cache tokens and $ cost (Claude
+      Console usage view per key), wall-clock time, and task success.
+      Multiply out to tasks-per-student × N=161 (×2 if the ablation
+      factor is on) → this sets the recommended personal spend limit,
+      validates the ~$20
+      spend-limit guidance for the four-run 2×2, and gives the professor the real numbers for the
+      model-tier decision. Note: the course runs at model defaults —
+      the thinking-on/off variants are measured here for cost
+      information, not as a change to the run policy.
+- [x] ~~Questionnaire-ablation decision~~ — DECIDED (2026-07-23): ON
+      for everyone (`DTLAB_PERSONA_FACTOR=1` shipped), run on BOTH days
+      as half of the 2×2. Per-day counterbalanced grounding order goes
+      on the LMS assignment sheet; students' personal spend limit is $20.
 - [ ] Turn this repo into a **template repo** (Settings → Template
-      repository) after the professor's items land in
-      `questionnaire/questionnaire_items.csv`.
+      repository) once the Form is frozen.
+- [ ] **Pin the installers** (see "Updating installer pins" below) —
+      the provisioning scripts refuse to build while any checksum is
+      `UNPINNED`. Then enable **Codespaces prebuilds** on the template
+      repo so all students share one frozen, pre-tested image.
 - [ ] **Full dry run from a Codespace** against real amazon.in with a real
       account: build time, `hermes setup` flow, `/browser connect`,
       Bootstrap (order-history reading quality), one complete task,
       CAPTCHA frequency from Azure IPs. This dry run decides
       Codespaces-vs-fallback (see CLOUD_SETUP.md decision rule). Log
       every deviation from the docs — Hermes moves fast; our pinned
-      commands may lag a release.
+      commands may lag a release. Work ALL items of the **live
+      T-21 dry-run list at the top of `docs/CHANGELOG.md`** during this
+      run (browser attach, transcript paths, pins, noVNC password,
+      model-ID capture, quotas, Forms scale, profile sharing,
+      breadcrumb selector, CAND compliance, tier cost benchmark,
+      category links, cart selectors) and tick them off there.
 - [ ] Validate the fragile DOM-dependent code against live amazon.in:
-      `tools/log_human_session.py` (cart-click selector, URL parsing) and,
-      only if the research add-on is used, `data-pipeline/scrape_orders.py`
-      (SELECTORS dict is the single patch point).
-- [ ] Claude Console: course workspace, hard cap, generate 180 keys via
-      the Admin API (script it), map key→pseudonym→LMS distribution.
-- [ ] Build the arm-randomization list (stratified; H_FIRST/A_FIRST) and
-      the LMS assignment sheet BEFORE session 2.
+      `tools/log_human_session.py` (cart-click selector, breadcrumb
+      category selector, URL parsing) and, only if the research add-on
+      is used, `data-pipeline/scrape_orders.py` (SELECTORS dict is the
+      single patch point).
+- [ ] **API-account setup checklist (pre-week homework):** publish the
+      LMS checklist — create your own Anthropic Console account, complete
+      billing with a small credit purchase, set a personal **monthly
+      spend limit of ~$10** in Console settings, generate one API key,
+      store it only where dtlab-start puts it. Verify completion against
+      the roster via the session-1 smoke test; hold 2–3 course-owned
+      spare keys for failed setups. Rate limits are per account, so ~80
+      concurrent agents share nothing.
+- [ ] Build the LMS assignment sheet BEFORE the lab week: pseudonym,
+      section, self-selected pair, and per-day grounding order (Thursday
+      P_FIRST/NP_FIRST; Friday independently re-randomized) — stratified
+      by section. The order-arm (H_FIRST/A_FIRST) list is retired: all
+      students are human-first (Wednesday).
 - [ ] Create the synthetic persona pack (fictional Form row + a fictional
       order history narrative) for opt-out students.
 - [ ] Run `tests/simulate_submission.sh` after ANY change to
       `tools/pack_evidence.py`, `templates/`, or `agent/SOUL.md`'s
       logging/picks protocol — it regression-tests the whole validation
-      chain without a browser.
-- [ ] Wi-Fi capacity check with facilities for 180 concurrent noVNC
-      streams; decide on cohort staggering (2×90) if weak.
+      chain without a browser (safely: it runs in a throwaway sandbox
+      HOME). Run `python3 tests/test_instrument_lockstep.py` after ANY
+      change to the questionnaire CSV, `dtlab_config.env`, or
+      `make_persona.py`. CI (`.github/workflows/ci.yml`) runs both plus
+      shellcheck/ruff on every push.
+- [ ] Wi-Fi capacity check with facilities for ~80 concurrent noVNC
+      streams per section (~1–3 Mbps each, ≈160–300 Mbps sustained,
+      long-lived websockets). Confirm: WAN headroom ≥ 2× that; ≤ ~25–30
+      active clients per AP on 5/6 GHz; no captive-portal re-auth or
+      websocket idle timeout within 3 hours; no per-user throttling
+      below ~3 Mbps; students' phones on mobile data. Then run a 15–20
+      student pilot in the actual room and measure per-stream bitrate.
+      (The morning/afternoon section split already staggers the load.)
+- [ ] After submissions close: bulk-download all zips from the BITSoM
+      LMS into one folder (LMS renaming of files is harmless — identity
+      comes from inside the zip) and run `python3 tools/analyze_cohort.py --zips <folder>`
+      (needs `pip install pandas plotly`, scipy optional) — it produces
+      the self-contained cohort report for the debrief session. Open
+      `docs/sample_report.html` FIRST to see exactly what you should
+      get (synthetic data, marked as such — regenerate it anytime with
+      the fabricator in `tests/test_analyze_cohort.py`). Skim each
+      manifest's `redaction_report` and `validation_issues` while
+      grading; the same test shows the expected zip shape if a
+      submission fails to parse.
+
+## Updating installer pins (supply-chain hygiene)
+
+`provisioning/provision.sh` and `.devcontainer/setup.sh` download remote
+installers (Hermes, uv) to a file, verify a SHA-256 recorded in the
+script, then execute — never `curl | bash`. Ships with `UNPINNED`
+placeholders that make the build fail on purpose. To pin (or re-pin after
+a release):
+
+1. On a trusted machine, download the installer at the exact URL in the
+   script and read it once (sanity check, it's a shell script).
+2. `sha256sum <file>` → paste the hash into the `*_SHA256` variable and,
+   where the project offers versioned URLs, pin the URL to that release.
+3. Pin `PLAYWRIGHT_PIN` (e.g. `==1.55.0`) to the version you dry-ran.
+4. Rebuild a fresh codespace/VM from scratch and re-run the dry run.
+5. Commit the pin change; rebuild the Codespaces prebuild.
+
+Never set `DTLAB_ALLOW_UNPINNED=1` for anything students will use — it
+exists only for throwaway test builds.
 
 ## Things you must NOT do
 - Commit any student data or API keys (`.gitignore` blocks the obvious
   paths — think before you `git add -f`).
-- Weaken the bias quarantine (`~/dtlab/human/` vs agent workspace) or the
-  arm-aware ordering checks in `pack_evidence.py`; they are what makes
-  the experiment defensible.
+- Weaken the bias quarantine (`~/dtlab/human/` vs agent workspace), the
+  arm-aware ordering checks, the verdict–ASIN cross-check, or the
+  redaction pass in `pack_evidence.py`; they are what makes the
+  experiment sound and safe.
 - "Fix" CAPTCHA friction with stealth/evasion tooling — out of scope by
   design (see the ethics sections).
+- Build anything student-facing with `DTLAB_ALLOW_UNPINNED=1`, or tell a
+  student to set the Lab Desktop port to Public — both exist as warnings
+  in the scripts for a reason.
+- Edit either SOUL, `templates/`, `tasks_config.csv`, or
+  `tools/pack_evidence.py` without re-running
+  `tests/simulate_submission.sh`; edit the questionnaire CSV,
+  `dtlab_config.env`, or `make_persona.py` without re-running
+  `tests/test_instrument_lockstep.py`. Green CI is the "double-checked
+  and safe" bar this course promised.
 
 ## License / sharing
 No license file yet — ask the professor before making the repo public or
