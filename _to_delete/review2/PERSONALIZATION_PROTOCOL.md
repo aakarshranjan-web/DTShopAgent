@@ -38,11 +38,9 @@ items from view** to clear the existing trail.
 **App:** profile icon → Browsing history (under "Keep shopping for") →
 gear icon → **Pause History → 1 day**.
 
-The pause lasts ONE day, so it is repeated on EVERY lab-day morning —
-Wednesday (human session), Thursday (economy runs), and Friday (frontier
-runs; `dtlab-start`'s day-2 gate re-confirms it). It self-reverses — no
-cleanup step, nothing left permanently changed on 161 personal accounts.
-`dtlab-start` gates on a self-attested confirmation each day.
+Pausing for 1 day on lab-day morning covers both sessions and
+self-reverses — no cleanup step, nothing left permanently changed on 161
+personal accounts. `dtlab-start` gates on a self-attested confirmation.
 Two notes for the handout: (a) users have reported the permanent on/off
 toggle occasionally flipping back on by itself — the pause appears more
 reliable, but students should verify the Browsing History page shows
@@ -51,15 +49,14 @@ BROWSING-driven surfaces (the contamination channel); purchase-driven
 surfaces like "Buy it again" remain, which is the baseline personalization
 we deliberately keep (Issue A).
 
-Each lab-day morning, before that day's first session:
+On lab-day morning, once, before EITHER session:
 1. amazon.in → Browsing History → gear icon (**Manage history**) →
    **Pause History → 1 day** → **Remove all items from view**.
 2. Verify the Browsing History page shows paused/empty.
 
-With browsing history paused on every lab day, the "previously viewed" /
-"inspired by browsing" surfaces never populate from the human's session
-(or from earlier agent runs), and all shoppers face symmetric
-conditions. (Purchase-history-driven
+With browsing history paused for BOTH sessions, the "previously viewed" /
+"inspired by browsing" surfaces never populate from the human's session,
+and the two shoppers face symmetric conditions. (Purchase-history-driven
 surfaces like "Buy it again" remain — that's Issue A, wanted.)
 (Gate implemented in `dtlab-start` as described above.) Note: Amazon may still use short-term session signals
 for ranking internally; the toggle removes the visible and strongest

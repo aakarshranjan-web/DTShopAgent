@@ -1,31 +1,24 @@
-# The task-category catalog — 6 utilitarian · 5 hedonic
+# The task-category catalog — 5 utilitarian · 5 hedonic
 
-The kit ships a catalog of eleven shopping-task categories for the
-amazon.in digital-twin experiment, selected on three grounds: they are
-purchases an Indian MBA cohort (residential campus, Mumbai, ~22–28 y/o)
-makes routinely; each carries an established utilitarian or hedonic
-classification in the consumer-research literature; and the classes are
-paired at matching price bands wherever the contrast is analyzed, so the
-utilitarian–hedonic comparison is not confounded with budget. All frames
-are **self-purchase** — the earlier gift and replenishment frames are
-retired (buying for a third party and habitual replenishment are
-different research questions; design_rationale §8).
+The kit ships a catalog of ten shopping-task categories for the amazon.in
+digital-twin experiment, selected on three grounds: they are purchases an
+Indian MBA cohort (residential campus, Mumbai, ~22–28 y/o) makes routinely;
+each carries an established utilitarian or hedonic classification in the
+consumer-research literature; and the two classes are paired at matching
+price bands so the utilitarian–hedonic contrast is never confounded with
+budget.
 
-**Where the catalog lives.** All eleven categories sit in
-`tasks_config.csv` (repo root); a leading `#` on the `task_id` marks a
-row inactive, and every row carries its amazon.in category link in the
-`amazon_url` column. A **provisional five ships active** — sneakers,
-power bank, backpack, laptop, perfume — and **the teaching team makes
-the final pick**: add `#` to rows you drop, remove it from rows you
-keep, renumber `task_id` 1..N, run `python3 tools/make_task_docs.py` to
-regenerate the student templates, re-run `tests/simulate_submission.sh`,
-and freeze. The packer, human logger, and cohort report all follow the
-active rows automatically, and each student shops the set in their own
-randomized order (enforced by `dtlab-start`). The category links define
-scope for the instructor, TA, and handout; the agent shops the full site
-under `SOUL.md`'s targeted rules (browsing-history-derived modules
-banned, candidates provenance-logged), and students shop
-naturalistically.
+**Where the catalog lives.** All ten categories are pre-loaded in
+`tasks_config.csv` (repo root) as inactive rows — a leading `#` on the
+`task_id` marks a row inactive, and every row carries its amazon.in
+category link in the `amazon_url` column. To compose a task set: add `#`
+to the rows you drop, remove it from the rows you keep, renumber
+`task_id` 1..N, run `python3 tools/make_task_docs.py` to regenerate the
+student templates, re-run `tests/simulate_submission.sh`, and freeze. The
+packer, human logger, and cohort report all follow the active rows
+automatically. The category links define scope for the instructor, TA,
+and handout; the agent's candidate generation remains keyword-search-only
+per `SOUL.md`, and students shop naturalistically.
 
 **Classification is measured, not just cited.** The cohort's own HED/UT
 scores for the chosen categories are collected with the Voss, Spangenberg
@@ -48,7 +41,7 @@ review. Full references in the source register below.
 
 ---
 
-## Utilitarian six
+## Utilitarian five
 
 ### U1 — Sunscreen (daily-use personal care) · ceiling ₹600
 **Task frame:** "Add to cart a sunscreen (or your daily-use skincare staple) you would actually repurchase."
@@ -69,19 +62,13 @@ review. Full references in the source register below.
 **Cohort fit:** universal student equipment with a concrete MBA use case (commute, placements, case competitions); a mature mid-ticket amazon.in category.
 **Classification:** luggage is in Crowley et al.'s (1992) measured category set and evaluation is functional-attribute-driven — capacity, laptop sleeve, warranty — the utilitarian evaluation mode (Dhar & Wertenbroch 2000). Backpacks also carry style attributes; the cohort-measured HED/UT scores are the classification of record for this category.
 
-### U4 — Laptop · ₹40,000–1,20,000 (high-stakes anchor; shipped active)
-**Task frame:** "Add to cart a laptop you would buy for your next two years of work and placement season."
-**Category link:** https://www.amazon.in/Laptops/b?node=1375424031
-**Cohort fit:** the single most consequential purchase of an MBA student's placement season; India's laptop market runs squarely through amazon.in, and the ₹40k–1.2L band spans mainstream Windows machines to MacBooks. Because the agent works from the lab's Linux container, it receives no signal of the student's own device — any Apple-vs-Windows ecosystem preference must come from the questionnaire or the purchase profile, making the choice a clean brand-ecosystem inference test.
-**Classification:** personal computers are among the highest-scoring utilitarian categories in Crowley et al.'s (1992) measured set and a stock utilitarian example in Khan, Dhar & Wertenbroch (2004); evaluation is specification- and reliability-driven. Its design role is the **stakes gradient**: a considered durable where a wrong agent pick clearly hurts, anchoring the set from ₹800 accessory to ₹1.2L laptop.
-
-### U5 — Electric kettle · ₹800–2,000
+### U4 — Electric kettle · ₹800–2,000
 **Task frame:** "Add to cart an electric kettle for your hostel room."
 **Category link:** https://www.amazon.in/Kettles/b?node=1379984031
 **Cohort fit:** the archetypal purchase of Indian residential-campus life (chai, coffee, instant noodles), and small kitchen appliances are a breakout category with young online shoppers — air fryers alone drew 1.8M+ searches in FlipTrends 2025. BITSoM is residential, so the need is immediate and uniform.
 **Classification:** small household appliances are the literature's stock utilitarian examples — microwaves, vacuum cleaners, kitchen utensils (Khan, Dhar & Wertenbroch 2004; Crowley et al. 1992); purchase is specification-driven (wattage, capacity, auto cut-off).
 
-### U6 — Umbrella (monsoon gear) · ceiling ₹600
+### U5 — Umbrella (monsoon gear) · ceiling ₹600
 **Task frame:** "Add to cart an umbrella that will survive a Mumbai monsoon."
 **Category link:** https://www.amazon.in/Umbrellas/b?node=2917474031
 **Cohort fit:** a September course in Mumbai lands at the tail of the monsoon; rain protection is an unavoidable, universally understood purchase for this cohort at this time and place.
@@ -120,9 +107,9 @@ review. Full references in the source register below.
 **Cohort fit:** hostel-room personalization is a ritual of Indian campus life and a thriving low-ticket amazon.in segment; the home/lifestyle cluster is the fastest-growing block of Indian e-retail (Bain 2025).
 **Classification:** aesthetic and ambiance goods are definitional hedonic consumption — paintings and flowers are listed hedonic examples (Khan, Dhar & Wertenbroch 2004; Hirschman & Holbrook 1982); the purchase's payoff is entirely experiential.
 
-*(Gift and replenishment frames are retired from the catalog:
-questionnaire item PR09, authored as the gift benchmark, stays a general
-stated-preference item — keep or swap at instrument freeze.)*
+*(The gift task remains its own frame — active row 3 in the shipped
+config, classed hedonic, with its direct stated-preference benchmark in
+the questionnaire (PR09).)*
 
 ---
 
@@ -130,17 +117,12 @@ stated-preference item — keep or swap at instrument freeze.)*
 
 | Band | Utilitarian | Hedonic |
 |---|---|---|
-| ≤ ₹600 | Sunscreen · Umbrella | Chocolate · Room décor |
-| ₹800–1,500 | Power bank | Perfume |
-| ₹1,000–2,500 | Backpack · Kettle* | Sneakers · Speaker |
-| ₹40,000–1,20,000 | Laptop (unpaired high-stakes anchor) | — |
+| ≤ ₹600 | U1 Sunscreen · U5 Umbrella | H1 Chocolate · H5 Room décor |
+| ₹800–1,500 | U2 Power bank | H2 Perfume |
+| ₹1,000–2,500 | U3 Backpack · U4 Kettle* | H3 Sneakers · H4 Speaker |
 
-*Kettle band is ₹800–2,000 — pair it with the speaker for the closest
-match. The **shipped active five** (sneakers, power bank, backpack,
-laptop, perfume) uses two price-matched cross-class pairs —
-sneakers/backpack and perfume/power bank — plus the laptop as the
-high-stakes anchor outside the pairing (its class contrast is carried by
-the pairs, not by the anchor).
+*Kettle band is ₹800–2,000 — pair it with the speaker for the closest match.
+Balanced 6-task selections: {U1, U2, U3, H1, H2, H3} or {U1, U2, U4, H1, H2, H4}.
 
 ## Source register
 

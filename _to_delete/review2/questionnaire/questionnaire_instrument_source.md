@@ -279,7 +279,7 @@ single_select, 7-point [Definitely untrue; Not true; Probably not true; Neither 
 - **PR06** A category where the cheapest option always wins for you: — short_text
 - **PR07** A category where you always go premium: — short_text
 - **PR08** Name one item currently in your amazon.in cart or wishlist: — short_text
-- **PR09** Describe the birthday gift (max ₹1,500) you would buy your closest friend, and why: — long_text *(authored for the retired gift task frame; now a general stated-preference item — keep or swap at instrument freeze)*
+- **PR09** Describe the birthday gift (max ₹1,500) you would buy your closest friend, and why: — long_text *(direct stated-preference benchmark for the gift task)*
 
 ---
 

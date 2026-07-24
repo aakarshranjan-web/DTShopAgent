@@ -114,7 +114,7 @@ concrete machinery, so you recognize it when you see it:
       the four-run 2×2. Per-run tier capture ships with the 4-run
       tooling (docs/WORK_ORDER_4RUN.md).
 - [ ] **Finalize the FIVE categories with the professor.** The design
-      is five self-purchase categories from the **11-category catalog**
+      is five self-purchase categories from the **10-category catalog**
       in `tasks_config.csv` (rationale and sources in
       `docs/TASK_CATEGORIES_10.md`); a provisional five is active
       (sneakers, power bank, backpack, laptop, perfume). To change
@@ -186,7 +186,7 @@ concrete machinery, so you recognize it when you see it:
 - [ ] **API-account setup checklist (pre-week homework):** publish the
       LMS checklist — create your own Anthropic Console account, complete
       billing with a small credit purchase, set a personal **monthly
-      spend limit of ~$20** in Console settings, generate one API key,
+      spend limit of ~$10** in Console settings, generate one API key,
       store it only where dtlab-start puts it. Verify completion against
       the roster via the session-1 smoke test; hold 2–3 course-owned
       spare keys for failed setups. Rate limits are per account, so ~80

@@ -27,15 +27,6 @@ agent_picks.csv
 tier.txt
 arm.txt
 persona_order.txt
-persona_order_day*.txt
-task_order.txt
-sandbox.txt
-verdicts.csv
-head_to_heads.csv
-overall_reflections.md
-cart_run*.json
-cart_run*.png
-*.bak
 
 # kit files that must STAY tracked despite the data patterns above
 !templates/human_picks.csv

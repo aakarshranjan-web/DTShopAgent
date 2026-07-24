@@ -35,12 +35,9 @@ divergence). D10 carries an added "Prefer not to say" option
 
 ## Design notes (optional but recommended)
 
-- The evaluation bites hardest when a handful of items are *deliberately
-  predictive* — items whose answers a task category can directly test
-  (e.g. PR05 brand loyalty against the laptop pick, PR07 go-premium
-  categories against the verdicts). Note: PR09 was authored for the
-  retired gift frame and now serves as a general stated-preference item
-  — keep or swap at instrument freeze (teaching-team call).
+- The comparison memo bites hardest when a handful of items are *deliberately
+  predictive* — e.g. "describe the gift you'd buy your closest friend for
+  ₹1,500" gives you a direct stated-preference benchmark for the gift task.
 - Keep at least a few stated-preference items that your students' purchase
   histories can contradict; the stated-vs-revealed conflicts are reliably the
   best material in the memos and in the cohort analysis.

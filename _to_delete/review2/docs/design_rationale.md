@@ -59,7 +59,7 @@ and a TA work item to log every deviation.
 **Decision (updated 2026-07).** Claude (Sonnet-class) via each student's
 **own Anthropic account and API key**, set up before lab week from an
 LMS checklist (Console account, billing, small credit purchase, a
-personal ~$20 monthly spend limit, one key). The pre-flight collects the
+personal ~$10 monthly spend limit, one key). The pre-flight collects the
 key with hidden input into a 600-permission env file; the packer redacts
 key patterns from every artifact.
 
@@ -67,8 +67,7 @@ key patterns from every artifact.
 reliable enough for a *timed classroom session* — a failed run at minute
 70 of a 3-hour session with ~80 people has no retry slack. Sonnet-class
 models deliver that reliability at a cost where a full three-task run is
-well under $2 (the four-run 2×2 lands around $3–6); a ~$20 personal
-spend limit covers retries, making total
+well under $2; a ~$10 personal spend limit covers retries, making total
 course cost trivial against 15 contact hours. Student-owned accounts
 distribute rate limits — every account has its own request and token
 budget, so ~80 concurrent agents share nothing, and prompt-cache reads
@@ -85,7 +84,7 @@ caps and a kill switch are attractive, but one org-level rate-limit pool
 under ~80 concurrent browser agents is the binding constraint, and
 generating, distributing, and revoking 161 keys is avoidable logistics.
 The per-account spend limit replaces the central cap; the cost of losing
-the central kill switch is bounded by that same limit (~$20/student).
+the central kill switch is bounded by that same limit (~$10/student).
 
 **Model policy (2026-07 update).** Anthropic models only, **all settings
 at defaults** — no temperature or sampling overrides. (Temperature-0
@@ -419,8 +418,7 @@ authored as the gift task's stated-preference benchmark; with no gift
 task it stays a general stated-preference item — swap or keep at
 instrument freeze, teaching-team call.)
 
-**No asking back (autonomy is the treatment).** All three SOULs (the
-sandbox variant included) forbid the
+**No asking back (autonomy is the treatment).** Both SOULs forbid the
 agent from asking the human anything during a task (the CAPTCHA halt
 is the sole exception): where the grounding files are silent, it must
 note the gap and choose conservatively. A deployed shopping agent
@@ -467,18 +465,15 @@ cross-checks every verdict against the two picks files' ASINs, rejecting
 turning one category into an objective, verified measurement.
 
 **Seven deliverables, one validated file.** Questionnaire (persona
-files), purchase profile (agent-written once, reused across runs), the
-tasks as given (in the student's assigned order), the full agent trace
-per run (decision logs + auto-collected Hermes session transcripts),
-agent picks per run (structured CSV + `dtlab-cart`'s screenshot and
-parsed cart contents, cross-checked against the picks), human picks +
-shopping clickstream, and the structured evaluation captured by
-`dtlab-verdict` (verdicts, ratings, rationales, head-to-heads, Overall
-reflections). `dtlab-pack` validates all of it (row counts, real ASINs,
-verdict–ASIN consistency, quarantine, human-first ordering, per-run
-condition/tier bookkeeping, the manipulation check), writes SHA-256
-hashes and the full design metadata into `manifest.json`, renders a
-self-contained `report.html` for graders, and emits one zip. Invalid packs still produce the zip but exit non-zero with
+files), purchase profile (agent-written), the tasks as given, the full
+agent trace (decision log + auto-collected Hermes session transcripts
+since the run marker), agent picks (structured CSV + cart screenshot),
+human picks + shopping clickstream, and the comparison with parsed
+verdict lines. `dtlab-pack` validates all of it (row counts, real ASINs,
+verdict–ASIN consistency, quarantine, arm-consistent ordering, no
+leftover placeholders), writes SHA-256 hashes and the arm into
+`manifest.json`, renders a self-contained `report.html` for graders, and
+emits one zip. Invalid packs still produce the zip but exit non-zero with
 an explicit fix list — a student cannot silently submit an incomplete
 pack, and the instructor cannot receive one without knowing what's
 missing. Cohort assembly then reduces mostly to concatenating CSVs; only

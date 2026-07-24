@@ -9,12 +9,12 @@ Per participant (N = cohort size), the design produces a paired-choice dataset:
 | Unit | Variables |
 |---|---|
 | Participant | 115 coded questionnaire items (dtlab-persona-v1; authoritative source: `questionnaire_instrument_source.md` — 15 demographics, 57 validated-scale items from 12 published scales per the Toubia et al. 2025 Twin-2K-500 battery selections, 22 amazon.in shopping-behavior items, 12 values/constraints of which VC01–VC05 are CONSTRAINT items, 9 predictive items); purchase profile as agent-extracted `purchase_profile.md` (traceable-claims rule in SOUL.md; precise dtlab-orders-v1 CSV only for the optional post-course export add-on subgroup); demographics |
-| Participant × session | human shopping-process clickstream (dtlab-humanlog-v1.3): search queries, product views (ASIN + dwell sequence), cart-add clicks, filters/sorts — captured passively by log_human_session.py BEFORE the agent runs |
+| Participant × session | human shopping-process clickstream (dtlab-humanlog-v1): search queries, product views (ASIN + dwell sequence), cart-add clicks, filters/sorts — captured passively by log_human_session.py BEFORE the agent runs |
 | Task × participant (5 per participant; categories + count from tasks_config.csv) | human pick made first (uncontaminated: the student never sees the agent before choosing) (title, ASIN, price, stated reasoning), agent pick (title, ASIN, price), agent decision log with item-code citations, sponsored-listing flag, human intervention count, student's better/worse/equal/different verdict |
 
 **Design (plan of record): a within-participant 2×2 across four agent
 runs.** The task set is five self-purchase categories from the
-11-category catalog (tasks_config.csv; gift and replenishment frames
+10-category catalog (tasks_config.csv; gift and replenishment frames
 retired — buying for a third party and habitual replenishment are
 different research questions). **Task order is randomized across
 participants and held constant within participant** (derived
@@ -136,7 +136,7 @@ GenAI quality-assurance metascience agenda).
 - `student_start.sh` refuses to launch if raw export files or PII-named
   files sit in the agent workspace.
 - API keys belong to the students' own Anthropic accounts. Each account
-  carries a personal monthly spend limit (~$20, set during the pre-week
+  carries a personal monthly spend limit (~$10, set during the pre-week
   checklist and confirmed at pre-flight); the key lives only in the
   student's 600-permission env file, is content-redacted from every
   packed artifact by `dtlab-pack`, and the student can delete it from
@@ -185,15 +185,14 @@ Assembly steps:
 - `dtlab-orders-v1`: student_id, order_date, brand_guess[/brand,
   brand_source], product_title, asin, unit_price_inr, quantity,
   capture_method.
-- `dtlab-humanlog-v1.3` (JSONL events): ts, student_id, type
+- `dtlab-humanlog-v1.2` (JSONL events): ts, student_id, type
   {session_start|search|product_view|cart_add|filter_sort|nav|session_end},
   plus type-specific fields (query/page/sort; asin/title). v1.1 adds
   `category` (the product page's breadcrumb) to product_view; v1.2 adds
   `ref` (the amazon ref= slug of the view — the surface the click came
   from, bucketed by the analyzer into the same provenance buckets as
-  the agent's CAND source= field); v1.3 adds the task_start/task_end
-  markers of the guided one-task-at-a-time session. All additive, older
-  parsers unaffected. Checkout, payment, and auth paths are never logged;
+  the agent's CAND source= field). Both additive, older parsers
+  unaffected. Checkout, payment, and auth paths are never logged;
   non-amazon browsing is never logged.
 - `dtlab-candidates-v1` (machine-parsed from decision logs by the
   packer, per the ECP's mandatory `CAND |` line format): per run ×

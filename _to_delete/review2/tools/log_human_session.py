@@ -1,0 +1,331 @@
+#!/usr/bin/env python3
+"""
+log_human_session.py — instrument the STUDENT'S OWN shopping session.
+
+Runs BEFORE the agent ever starts. Opens the same persistent browser profile
+(and, where available, the same system Chromium binary) the agent will later
+use — this is deliberate: a session warmed by genuine human shopping is the
+best anti-bot mitigation available — and passively logs the student's
+shopping process while they complete the task set themselves — in their
+assigned randomized task order — exactly as they normally would.
+
+CAPTURED (to ~/dtlab/human/human_session.jsonl, schema dtlab-humanlog-v1):
+  search        — query text, results page number
+  product_view  — ASIN, page title, dwell start
+  cart_add      — click on Add-to-Cart / Buy-Now (injected listener)
+  filter_sort   — sort/filter changes visible in the URL
+  nav           — any other amazon.in navigation (fallback)
+
+NOT captured: keystrokes, non-amazon sites, passwords, payment pages
+(the /gp/buy and /checkout paths are explicitly dropped). All events are
+emitted by an injected page script through a binding that drops anything
+whose URL is not an amazon.in page, so a stray non-Amazon tab can never be
+logged.
+
+At the end the script walks the student through confirming their final pick
+per task (offering the products they viewed) and writes human_picks.csv.
+
+EVERYTHING is written to ~/dtlab/human/ — a directory the agent is barred
+from reading (SOUL.md hard boundary + pre-flight check), so the agent's run
+cannot be contaminated by the human's choices.
+
+USAGE
+  python3 log_human_session.py --student-id DT2026-042
+  ...the terminal walks you through the tasks ONE AT A TIME in your
+  assigned order (press Enter after each cart-add); empty the cart at
+  the end, then confirm your picks...
+"""
+
+import argparse
+import csv
+import json
+import re
+import shutil
+import sys
+import threading
+import time
+from datetime import datetime, timezone
+from pathlib import Path
+from urllib.parse import urlparse, parse_qs
+
+from playwright.sync_api import sync_playwright
+
+HUMAN_DIR = Path.home() / "dtlab" / "human"
+ASIN_RE = re.compile(r"(?:/dp/|/gp/product/)([A-Z0-9]{10})")
+ASIN_FULL_RE = re.compile(r"[A-Z0-9]{10}")
+BLOCK_PATHS = ("/gp/buy", "/checkout", "/payments", "/ap/")  # never log these
+# v1.1 added `category`; v1.2 adds `ref` (the amazon ref= slug of the
+# product view — which surface the click came from); v1.3 adds
+# task_start/task_end boundary events (the logger walks the student
+# through the tasks ONE AT A TIME in their assigned order, so every
+# event — search, view, filter, time — is attributable to its task
+# exactly). All additive.
+SCHEMA = "dtlab-humanlog-v1.3"
+REF_RE = re.compile(r"/ref=([^/?#]+)")
+
+
+def load_config():
+    cfg = {}
+    p = Path.home() / "dtlab" / "dtlab_config.env"
+    if p.exists():
+        for line in p.read_text(encoding="utf-8").splitlines():
+            line = line.strip()
+            if not line or line.startswith("#") or "=" not in line:
+                continue
+            k, v = line.split("=", 1)
+            cfg[k.strip()] = v.strip().strip("'\"")
+    return cfg
+
+
+CFG = load_config()
+# same profile the agent uses (see tools/dtlab_browser.sh)
+PROFILE = Path.home() / CFG.get("DTLAB_BROWSER_PROFILE",
+                                ".dtlab-browser-profile")
+
+# All events flow through this injected script -> dtlabEvent binding.
+# Main frame only; page_load also covers pushState/popstate SPA navigation.
+# No Playwright sync-API call ever happens inside an event handler (the sync
+# API forbids that), and titles arrive from the page itself.
+PAGE_JS = """
+(() => {
+  if (window !== window.top) return;
+  const cat = () => {
+    const el = document.querySelector('#wayfinding-breadcrumbs_feature_div');
+    return el ? el.innerText.replace(/\\s*\\n\\s*/g, ' ')
+                  .replace(/\\s+/g, ' ').trim().slice(0, 200) : '';
+  };
+  const emit = (type, extra) => {
+    if (!window.dtlabEvent) return;
+    try {
+      window.dtlabEvent(JSON.stringify(Object.assign(
+        {type: type, url: location.href, title: document.title,
+         category: cat()},
+        extra || {})));
+    } catch (e) {}
+  };
+  document.addEventListener('click', (e) => {
+    const el = e.target.closest(
+      '#add-to-cart-button, #buy-now-button,' +
+      ' input[name="submit.add-to-cart"],' +
+      ' [data-action="add-to-cart"], #add-to-cart-button-ubb');
+    if (el) emit('cart_add');
+  }, true);
+  window.addEventListener('load', () => emit('page_load'));
+  const wrap = (fn) => function () {
+    const r = fn.apply(this, arguments);
+    setTimeout(() => emit('page_load'), 80);
+    return r;
+  };
+  history.pushState = wrap(history.pushState);
+  history.replaceState = wrap(history.replaceState);
+  window.addEventListener('popstate',
+                          () => setTimeout(() => emit('page_load'), 80));
+})();
+"""
+
+
+def clean_title(title):
+    return re.sub(r"\s*[-|].*?Amazon\.in.*$", "", title or "").strip()
+
+
+def amazon_host(url):
+    host = urlparse(url).netloc.lower().split(":")[0]
+    return host == "amazon.in" or host.endswith(".amazon.in")
+
+
+class Logger:
+    def __init__(self, out_path, student_id):
+        self.f = open(out_path, "a", encoding="utf-8")
+        self.lock = threading.Lock()
+        self.student_id = student_id
+        self.viewed = {}   # asin -> latest title (for pick confirmation)
+        self._last = ("", 0.0)   # (url, monotonic) — dedupe double page_load
+
+    def emit(self, type_, **kw):
+        rec = {"ts": datetime.now(timezone.utc).isoformat(),
+               "student_id": self.student_id, "type": type_, **kw}
+        with self.lock:
+            self.f.write(json.dumps(rec, ensure_ascii=False) + "\n")
+            self.f.flush()
+
+    def on_nav(self, url, title="", category=""):
+        if not amazon_host(url):
+            return                       # never log non-amazon browsing
+        u = urlparse(url)
+        if any(u.path.startswith(b) for b in BLOCK_PATHS):
+            return                       # never log checkout/payment/auth
+        now = time.monotonic()
+        if url == self._last[0] and now - self._last[1] < 2.0:
+            return                       # load + pushState double-fire
+        self._last = (url, now)
+        q = parse_qs(u.query)
+        m = ASIN_RE.search(u.path)
+        if m:
+            asin = m.group(1)
+            t = clean_title(title)
+            self.viewed[asin] = t or self.viewed.get(asin, "")
+            # provenance: amazon's ref= slug names the surface the click
+            # came from (search rank, carousel, Buy Again, ...) — the
+            # human-side counterpart of the agent's CAND source= field
+            rm = REF_RE.search(u.path)
+            ref = rm.group(1) if rm else \
+                (q.get("ref_") or q.get("ref") or [""])[0]
+            self.emit("product_view", asin=asin, title=t, url=u.path,
+                      category=category, ref=ref[:80])
+        elif u.path == "/s" and "k" in q:
+            self.emit("search", query=q["k"][0],
+                      page=q.get("page", ["1"])[0],
+                      sort=q.get("s", [""])[0])
+        elif "rh" in q or "s" in q:
+            self.emit("filter_sort", url=u.path + "?" + u.query[:200])
+        else:
+            self.emit("nav", url=u.path)
+
+    def on_binding(self, source, payload):
+        try:
+            d = json.loads(payload)
+        except json.JSONDecodeError:
+            return
+        url = d.get("url", "")
+        if not amazon_host(url):
+            return                       # stray non-Amazon tab: drop
+        if d.get("type") == "page_load":
+            self.on_nav(url, d.get("title", ""), d.get("category", ""))
+        elif d.get("type") == "cart_add":
+            m = ASIN_RE.search(url)
+            self.emit("cart_add", asin=m.group(1) if m else "",
+                      title=clean_title(d.get("title", "")))
+
+
+def load_task_ids():
+    """Task list from ~/dtlab/tasks_config.csv as (id, product_type,
+    budget-string); falls back to a generic three tasks so the tool
+    still works standalone. Rows whose task_id starts with '#' are
+    inactive catalog entries."""
+    p = Path.home() / "dtlab" / "tasks_config.csv"
+    tasks = []
+    if p.exists():
+        with open(p, newline="", encoding="utf-8-sig") as f:
+            for r in csv.DictReader(f):
+                tid = (r.get("task_id") or "").strip()
+                if not tid or tid.startswith("#"):
+                    continue
+                try:
+                    lo = int(r.get("budget_min_inr") or 0)
+                    hi = int(r.get("budget_max_inr") or 0)
+                    budget = (f"Rs.{lo}-{hi}" if lo
+                              else f"up to Rs.{hi}") if hi else ""
+                except ValueError:
+                    budget = ""
+                tasks.append((tid,
+                              (r.get("product_type") or "").strip(),
+                              budget))
+    return tasks or [("1", "", ""), ("2", "", ""), ("3", "", "")]
+
+
+def ordered_tasks(tasks, student_id):
+    """The student's randomized task order — deterministic from the
+    pseudonym, so the human session and all four agent runs share it.
+    Ranking is in LOCKSTEP with student_start.sh and pack_evidence.py."""
+    import hashlib
+    return sorted(tasks, key=lambda tp: hashlib.sha256(
+        f"{student_id}|{tp[0]}".encode()).hexdigest())
+
+
+def confirm_picks(log: Logger, student_id):
+    """Interactive confirmation of the final pick per task -> human_picks.csv."""
+    recent = list(log.viewed.items())[-15:]
+    print("\nProducts you viewed this session:")
+    for i, (asin, title) in enumerate(recent, 1):
+        print(f"  [{i:2d}] {asin}  {title[:70]}")
+    rows = []
+    for task, ptype, _budget in ordered_tasks(load_task_ids(), student_id):
+        label = f" ({ptype[:50]})" if ptype else ""
+        print(f"\n--- Task {task}{label}: your final pick ---")
+        while True:
+            sel = input("Number from the list above, or paste an ASIN: "
+                        ).strip()
+            if sel.isdigit() and 1 <= int(sel) <= len(recent):
+                asin, title = recent[int(sel) - 1]
+                break
+            cand = sel.upper()
+            if ASIN_FULL_RE.fullmatch(cand):
+                asin = cand
+                title = log.viewed.get(cand, "")
+                if not title:
+                    title = input("  Product title: ").strip()
+                break
+            print("  That is not a valid ASIN (10 characters A-Z/0-9, from "
+                  "the product URL after /dp/). Try again.")
+        price = input("  Price in Rs. (number only): ").strip()
+        why = input("  Why this one (2-3 sentences): ").strip()
+        rows.append({"task_id": task, "title": title, "asin": asin,
+                     "url": f"https://www.amazon.in/dp/{asin}",
+                     "price_inr": price, "reasoning": why})
+    out = HUMAN_DIR / "human_picks.csv"
+    with open(out, "w", newline="", encoding="utf-8") as f:
+        w = csv.DictWriter(f, fieldnames=["task_id", "title", "asin", "url",
+                                          "price_inr", "reasoning"])
+        w.writeheader()
+        w.writerows(rows)
+    print(f"\nWrote {out}")
+
+
+def main():
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--student-id", required=True)
+    args = ap.parse_args()
+    HUMAN_DIR.mkdir(parents=True, exist_ok=True)
+    log = Logger(HUMAN_DIR / "human_session.jsonl", args.student_id)
+    log.emit("session_start", schema=SCHEMA)
+
+    # Same binary the agent session uses, so the shared profile never sees
+    # version skew (see tools/dtlab_browser.sh). Fall back to Playwright's
+    # bundled Chromium only if no system chromium exists.
+    exe = shutil.which("chromium") or shutil.which("chromium-browser")
+    if not exe:
+        print("WARNING: no system chromium found — using Playwright's "
+              "bundled Chromium. Profile version skew with the agent "
+              "session is possible; flag this to a TA.", file=sys.stderr)
+
+    with sync_playwright() as p:
+        ctx = p.chromium.launch_persistent_context(
+            str(PROFILE), headless=False,
+            executable_path=exe or None,
+            viewport={"width": 1280, "height": 900})
+        ctx.expose_binding("dtlabEvent", log.on_binding)
+        ctx.add_init_script(PAGE_JS)
+
+        page = ctx.pages[0] if ctx.pages else ctx.new_page()
+        page.goto("https://www.amazon.in")
+        seq = ordered_tasks(load_task_ids(), args.student_id)
+        print(f"\n>>> You will shop your {len(seq)} tasks ONE AT A TIME,")
+        print(">>> in YOUR assigned order (same order as in tasks.md).")
+        print(">>> Log into amazon.in first if needed. Finish each task")
+        print(">>> (add your pick to the cart) BEFORE moving on — the")
+        print(">>> walkthrough is what makes your shopping measurable")
+        print(">>> per task. Shop each one exactly as you normally would.")
+        for i, (task, ptype, budget) in enumerate(seq, 1):
+            log.emit("task_start", task_id=task)
+            blabel = f" [{budget}]" if budget else ""
+            print(f"\n>>> ({i}/{len(seq)}) Task {task}: "
+                  f"{ptype[:70]}{blabel}")
+            input(">>> Shop for it now; AFTER adding your pick to the "
+                  "cart, press Enter... ")
+            log.emit("task_end", task_id=task)
+        print("\n>>> All tasks done. Now EMPTY the cart (your picks are")
+        print(">>> recorded next; the cart must be clean for the agent).")
+        input(">>> Cart emptied? Press Enter to confirm your picks... ")
+        try:
+            ctx.close()
+        except Exception:
+            pass
+
+    log.emit("session_end")
+    confirm_picks(log, args.student_id)
+    print("\nDone. Next step: dtlab-start (the agent run).")
+    print("Your picks live in ~/dtlab/human/ — the agent cannot read them.")
+
+
+if __name__ == "__main__":
+    sys.exit(main())

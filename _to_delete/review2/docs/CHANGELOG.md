@@ -1,38 +1,5 @@
 # Kit changelog
 
-## 2026-07-23 — Post-revision consistency review (full-repo pass)
-
-Independent review after the major revision; all suites re-run green in
-a clean environment (harness 49, start-flow 57, lockstep, analyzer,
-ruff, shellcheck). Fixes applied:
-
-- **Spend limit unified at $20** (TA_ONBOARDING, research_protocol §4,
-  design_rationale §2 — three stale ~$10 mentions).
-- **Catalog count corrected to 11** (6 utilitarian incl. laptop, 5
-  hedonic) in README, COURSE_PLAN, TA_ONBOARDING, research_protocol;
-  `docs/TASK_CATEGORIES_10.md` brought fully current: laptop entry
-  added (Crowley et al. PCs-as-utilitarian anchor, stakes-gradient
-  role, no-OS-signal ecosystem test), active-five status and
-  randomized-order mechanics documented, retired gift footnote and
-  stale search-only wording replaced, budget-pair table updated.
-- **Humanlog schema refs unified at v1.3** (research_protocol §1 table
-  + §6 registry now name v1.3 with the additive v1.1/v1.2/v1.3 notes).
-- **PR09 annotations updated** in the instrument source and
-  AUTHORING_GUIDE (general stated-preference item; keep-or-swap at
-  freeze) — item wording untouched, lockstep green.
-- **PERSONALIZATION Layer 1** now states the daily re-pause cadence
-  (Wed/Thu/Fri) instead of the retired one-day "both sessions" framing.
-- **design_rationale**: §8 no-ask-back now says all three SOULs; the
-  §8 seven-deliverables paragraph modernized (dtlab-cart cross-check,
-  dtlab-verdict capture, per-run bookkeeping — replaces comparison.md/
-  arm-era wording).
-- **.gitignore** extended for the new runtime artifacts: verdicts.csv,
-  head_to_heads.csv, overall_reflections.md, task_order.txt,
-  persona_order_day*.txt, sandbox.txt, cart_run*, *.bak.
-- Local junk (__pycache__/, .DS_Store, .ruff_cache/) moved out of the
-  working tree to _to_delete/ for manual deletion.
-
-
 ## 2026-07-23 — Task set: five self-purchase categories, randomized order
 
 Instructor decision (same day, after the 4-run implementation): the

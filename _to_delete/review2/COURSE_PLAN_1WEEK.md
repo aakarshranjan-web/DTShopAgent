@@ -12,7 +12,7 @@ concurrency at ~80, never 161.
 
 **Experimental design (plan of record):** the task set is **five
 self-purchase categories** picked by the teaching team from the
-11-category catalog in `tasks_config.csv` (a provisional five ships
+10-category catalog in `tasks_config.csv` (a provisional five ships
 active; no gift, no replenishment framing — every task is buying for
 yourself), shopped in a **per-student randomized order** (derived from
 the pseudonym, enforced by dtlab-start, identical for the human session

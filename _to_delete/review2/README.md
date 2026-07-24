@@ -316,7 +316,7 @@ The task structure lives in **`tasks_config.csv`** (task_id, frame,
 product_type, category_class utilitarian/hedonic, budget range,
 amazon.in category link) — the single source the pre-flight, packer,
 human logger, and cohort report all read. The plan of record: **five
-self-purchase categories** from the **11-category catalog** (6
+self-purchase categories** from the **10-category catalog** (5
 utilitarian, 5 hedonic, budget-paired, each with its amazon.in
 category link; rationale and sources in `docs/TASK_CATEGORIES_10.md`).
 Every task is buying for YOURSELF — the earlier gift and replenishment
