@@ -65,8 +65,8 @@ def load_config():
     cfg = {}
     p = HOME / "dtlab" / "dtlab_config.env"
     if p.exists():
-        for line in p.read_text(encoding="utf-8").splitlines():
-            line = line.strip()
+        for raw in p.read_text(encoding="utf-8").splitlines():
+            line = raw.strip()
             if not line or line.startswith("#") or "=" not in line:
                 continue
             k, v = line.split("=", 1)
@@ -164,7 +164,7 @@ def main():
         print("  [~] no cart JSON written — the packer will note that the "
               "picks/cart cross-check was skipped for this run.")
 
-    print("")
+    print()
     print("NOW EMPTY THE CART by hand (the kit never deletes anything on")
     print("the account) so the next run starts clean. Do not log out.")
     return 0

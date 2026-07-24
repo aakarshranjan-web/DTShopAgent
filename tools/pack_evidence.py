@@ -68,8 +68,8 @@ def load_config():
     cfg = {}
     p = HOME / "dtlab" / "dtlab_config.env"
     if p.exists():
-        for line in p.read_text(encoding="utf-8").splitlines():
-            line = line.strip()
+        for raw in p.read_text(encoding="utf-8").splitlines():
+            line = raw.strip()
             if not line or line.startswith("#") or "=" not in line:
                 continue
             k, v = line.split("=", 1)
@@ -127,7 +127,7 @@ def bucket_source(raw):
         return "search"
     if s.startswith("carousel"):
         return "carousel"
-    if s.startswith("buy_again") or s.startswith("buy it again"):
+    if s.startswith(("buy_again", "buy it again")):
         return "buy_again"
     if s.startswith("product_page"):
         return "product_page_link"
@@ -311,7 +311,7 @@ def env_metadata(runs_present=()):
     md = {}
     try:
         r = subprocess.run(["hermes", "--version"], capture_output=True,
-                           text=True, timeout=10)
+                           text=True, timeout=10, check=False)
         md["hermes_version"] = ((r.stdout or r.stderr).strip()
                                 .splitlines()[0][:200]
                                 if (r.stdout or r.stderr).strip() else None)
@@ -334,7 +334,7 @@ def env_metadata(runs_present=()):
     if tasks_p.exists():
         ttext = tasks_p.read_text(encoding="utf-8")
         m = re.search(r"Standardized agent prompt[^\n]*\n(.*)\Z", ttext,
-                      re.S)
+                      re.DOTALL)
         md["task_prompt_sha256"] = hashlib.sha256(
             (m.group(1) if m else ttext).strip().encode()).hexdigest()
     else:

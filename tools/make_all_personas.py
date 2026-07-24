@@ -81,7 +81,8 @@ def main():
         d = outdir / sid
         d.mkdir(parents=True, exist_ok=True)
         r = subprocess.run(
-            [sys.executable, str(MAKE_PERSONA), "--items", args.items,
+            check=False,
+            args=[sys.executable, str(MAKE_PERSONA), "--items", args.items,
              "--responses", args.responses, "--student-id", sid,
              "--outdir", str(d)],
             capture_output=True, text=True)

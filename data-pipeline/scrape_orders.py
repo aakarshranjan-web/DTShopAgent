@@ -38,7 +38,8 @@ import time
 from datetime import datetime, timezone
 from pathlib import Path
 
-from playwright.sync_api import sync_playwright, TimeoutError as PWTimeout
+from playwright.sync_api import TimeoutError as PWTimeout
+from playwright.sync_api import sync_playwright
 
 SCHEMA_VERSION = "dtlab-orders-v1"
 TOOL_VERSION = "scrape_orders 1.0 (2026-07)"

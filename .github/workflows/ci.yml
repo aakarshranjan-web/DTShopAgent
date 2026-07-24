@@ -15,7 +15,11 @@ jobs:
           python-version: "3.12"
 
       - name: Install linters
-        run: pip install ruff shellcheck-py
+        # ruff pinned: 0.16 changed the default rule set mid-course once
+        # already. ruff.toml at the repo root makes the rule selection
+        # explicit; the pin keeps local and CI byte-identical. Bump both
+        # together, deliberately.
+        run: pip install "ruff==0.16.0" shellcheck-py
 
       - name: shellcheck (all shell scripts)
         run: |

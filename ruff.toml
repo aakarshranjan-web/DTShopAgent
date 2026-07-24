@@ -1,0 +1,31 @@
+# Ruff configuration — the EXPLICIT rule set for this kit, so local runs
+# and CI enforce identical rules regardless of the installed ruff
+# version (ruff 0.16 expanded its defaults, which broke CI while older
+# local installs passed; this file ends that class of drift).
+#
+# Selected families (all findings fixed in-tree):
+#   E4/E7/E9, F  — pycodestyle errors + pyflakes (the classic core)
+#   I            — import ordering
+#   UP           — modern-Python upgrades
+#   PIE, FURB    — misc simplifications ruff can verify
+#   PLW          — pylint warnings (e.g. explicit subprocess check=)
+#   EXE          — shebang/executable-bit consistency
+#
+# Deliberately NOT selected (each conflicts with an intentional pattern):
+#   DTZ  — date-ONLY strings are parsed here; naive datetimes are correct
+#   BLE  — broad `except Exception` is deliberate resilience in the
+#          scrape/pack/capture loops (partial data is data; degrade,
+#          never crash a student's session)
+#   S    — S110 try/except/pass on browser close is deliberate
+#   SIM  — SIM115: long-lived file handles (clickstream logger) are the
+#          design; the rest of SIM overlaps with selected families
+#   ISC  — implicit string concatenation in list literals is the
+#          pervasive house style for wrapped prose strings
+#   C4   — C408: dict(...) kwargs are the plotly idiom throughout the
+#          cohort report
+target-version = "py310"
+
+exclude = ["_to_delete"]
+
+[lint]
+select = ["E4", "E7", "E9", "F", "I", "UP", "PIE", "FURB", "PLW", "EXE"]

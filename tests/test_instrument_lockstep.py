@@ -46,8 +46,8 @@ def check(cond, msg):
 
 def load_config():
     cfg = {}
-    for line in (REPO / "dtlab_config.env").read_text().splitlines():
-        line = line.strip()
+    for raw in (REPO / "dtlab_config.env").read_text().splitlines():
+        line = raw.strip()
         if not line or line.startswith("#") or "=" not in line:
             continue
         k, v = line.split("=", 1)
@@ -202,8 +202,8 @@ def main():
 
     # 9 (N3): fabricate a Form response row, run make_persona.py, count the
     # exact pattern student_start.sh greps ('^- **CODE** ...').
-    with tempfile.TemporaryDirectory() as td:
-        td = Path(td)
+    with tempfile.TemporaryDirectory() as tmp:
+        td = Path(tmp)
         id_header = "Your course-issued participant ID (e.g. DT2026-042)"
         headers = ["Timestamp", id_header] + \
                   [f"{r['item_code']}. {r['question']}" for r in rows]
@@ -215,7 +215,9 @@ def main():
             w.writerow(headers)
             w.writerow(row)
         r = subprocess.run(
-            [sys.executable, str(REPO / "questionnaire" / "make_persona.py"),
+            check=False,
+            args=[sys.executable,
+                  str(REPO / "questionnaire" / "make_persona.py"),
              "--items", str(CSV_PATH), "--responses", str(td / "responses.csv"),
              "--student-id", "DT2026-042", "--outdir", str(td)],
             capture_output=True, text=True)

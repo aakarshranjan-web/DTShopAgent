@@ -23,13 +23,13 @@ from pathlib import Path
 REPO = Path(__file__).resolve().parent.parent
 
 try:
-    import pandas   # noqa: F401
-    import plotly   # noqa: F401
+    import pandas  # noqa: F401
+    import plotly  # noqa: F401
 except ImportError:
     print("SKIP: pandas/plotly not installed (pip install pandas plotly)")
     sys.exit(0)
 
-ASINS = ["B0%08d" % i for i in range(500)]
+ASINS = [f"B0{i:08d}" for i in range(500)]
 VERDS = ["better", "identical", "equivalent", "inferior"]
 T5 = ("1", "2", "3", "4", "5")
 # task budgets of the 5-category self-purchase set (matches TASKS_CFG)
@@ -306,14 +306,14 @@ def fabricate_cohort(td, mixed=True):
 
 
 def main():
-    with tempfile.TemporaryDirectory() as td:
-        td = Path(td)
+    with tempfile.TemporaryDirectory() as tmp:
+        td = Path(tmp)
         n_valid = fabricate_cohort(td)
         out = td / "report.html"
         r = subprocess.run(
             [sys.executable, str(REPO / "tools" / "analyze_cohort.py"),
              "--zips", str(td), "--out", str(out)],
-            capture_output=True, text=True)
+            capture_output=True, text=True, check=False)
         if r.returncode != 0:
             print(r.stdout)
             print(r.stderr)

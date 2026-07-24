@@ -184,7 +184,7 @@ def bucket_source(raw):
         return "search"
     if s.startswith("carousel"):
         return "carousel"
-    if s.startswith("buy_again") or s.startswith("buy it again"):
+    if s.startswith(("buy_again", "buy it again")):
         return "buy_again"
     if s.startswith("product_page"):
         return "product_page_link"
@@ -202,15 +202,15 @@ def bucket_ref(ref):
     r = (ref or "").strip().lower()
     if not r:
         return "other"
-    if r.startswith("sr_") or "_sr_" in r or r.startswith("sspa_sr"):
+    if r.startswith(("sr_", "sspa_sr")) or "_sr_" in r:
         return "search"                     # search results (incl. rank)
-    if (r.startswith("pd_") or r.startswith("cm_") or "sims" in r
-            or "bxgy" in r or r.startswith("sspa_dk")):
+    if (r.startswith(("pd_", "cm_", "sspa_dk")) or "sims" in r
+            or "bxgy" in r):
         return "carousel"                   # recommendation modules
     if "byab" in r or "buy_again" in r or "buyagain" in r:
         return "buy_again"
-    if (r.startswith("lp_") or r.startswith("ct_") or "bbn" in r
-            or r.startswith("nav_") or "browse" in r):
+    if (r.startswith(("lp_", "ct_", "nav_")) or "bbn" in r
+            or "browse" in r):
         return "category_page"
     if r.startswith("dp_"):
         return "product_page_link"          # links on a product page
