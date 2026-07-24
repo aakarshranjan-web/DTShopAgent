@@ -1,5 +1,26 @@
 # Kit changelog
 
+## 2026-07-24 — CI fixed (ruff 0.16 drift) + "how this runs" explainers
+
+- **CI failure root-caused and fixed:** ruff 0.16.0 (installed fresh by
+  CI on every run) expanded its default rule set; local installs on
+  0.15.x kept passing — same command, different rules. Fix: `ruff.toml`
+  at the repo root now selects the rule set EXPLICITLY (deliberate
+  exclusions documented in-file), and ci.yml pins `ruff==0.16.0` so
+  local and CI stay byte-identical; bump both together. The useful
+  new-default findings were adopted (executable bits restored on all
+  shebanged scripts, import ordering, `startswith` tuples, explicit
+  `subprocess.run(check=)`, shadowed loop variables renamed);
+  `_to_delete/` excluded from linting.
+- **Plain-language architecture explainers added** (for novices):
+  README > "How this actually runs" and TA_ONBOARDING > "First: the
+  mental model" — the repo is a recipe that executes nothing; CI is
+  only the test suite (green ✓ = safe to build environments from that
+  commit); students click *Create codespace* and get a private
+  container built FROM the repo (no cloning, no pushing); student data
+  never enters git; the VM fallback is instructor-built. Freeze →
+  CI green → prebuilds, in that order.
+
 ## 2026-07-23 — Post-revision consistency review (full-repo pass)
 
 Independent review after the major revision; all suites re-run green in

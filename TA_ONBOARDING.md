@@ -7,6 +7,32 @@ serves three audiences from one commit — see README > "Who uses what"
 for the role map (students: four commands, ignore the repo; you: this
 file; instructor: design docs + analysis).
 
+## First: the mental model (repo ≠ course; nothing "runs" here)
+
+If you are new to GitHub, fix this picture in your head before touching
+anything (long version: README > "How this actually runs"):
+
+- **This repo is a recipe.** Student environments are BUILT from it;
+  it executes nothing by itself. Students never clone it, never see
+  it, never push to it.
+- **CI (the green ✓ / red ✗ on each commit) is just the test suite**
+  running on a GitHub server after every push: linters + the four
+  regression suites. Red means "the kit at this commit is broken —
+  don't build student environments from it." It involves no agents,
+  no Amazon, no student data. If CI is red, the failure log (repo >
+  Actions tab) names the exact file and check.
+- **Students click *Create codespace*** and GitHub builds each of them
+  a private cloud container from `.devcontainer/` (setup.sh installs
+  everything into `~/dtlab/` and creates the `dtlab-*` commands). The
+  commit on `main` at build time IS their environment — which is why
+  "freeze the design, CI green, enable prebuilds" is a hard sequence,
+  in that order.
+- **Student data never enters git.** It lives in each codespace and
+  leaves once, as the evidence zip uploaded to the LMS.
+- **Your levers:** edit files → run the test suites locally → commit +
+  push → CI confirms → rebuild/re-prebuild environments. Nothing else
+  moves anything anywhere.
+
 ## Read in this order (30 minutes)
 1. `COURSE_PLAN_1WEEK.md` — THE operative plan (2×3h sessions, two arms).
 2. `README.md` — file map + the seven deliverables and how each is captured.

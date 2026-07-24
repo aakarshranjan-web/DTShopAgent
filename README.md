@@ -34,6 +34,57 @@ with a research-grade data pipeline.
 > provenance logged (daily history pause + measured contamination
 > index).
 
+## How this actually runs (read this first if you're new to GitHub)
+
+A common misconception, worth clearing up before anything else: **this
+repository never "runs" the course, and students never clone it or run
+it locally.** The repo plays three separate roles:
+
+1. **It is the recipe, not the kitchen.** Everything here — the agent's
+   identity files, the task config, the tools, the checklists — is the
+   single source of truth the course environments are BUILT from.
+   Editing a file here changes what future environments contain; it
+   executes nothing by itself.
+
+2. **The only thing that executes "on GitHub" is the test suite.**
+   Every push triggers `.github/workflows/ci.yml` on a throwaway GitHub
+   server: it lints the code and runs the four regression suites
+   (submission packer, pre-flight state machine, questionnaire
+   lockstep, synthetic cohort report). No agent runs, no browser opens,
+   no student data exists there — it is purely a quality gate. A red ✗
+   on a commit means "do not build student environments from this
+   commit"; a green ✓ means the kit is internally consistent. That is
+   the entire meaning of CI here.
+
+3. **Students get a personal cloud computer built FROM the repo — one
+   click, no git.** The repo is a template: a student clicks *Create
+   codespace* and GitHub builds them a private container in the cloud
+   using `.devcontainer/` — `devcontainer.json` says what machine to
+   make, `setup.sh` runs once automatically and installs Hermes,
+   Chromium, and all lab tooling into `~/dtlab/`, creating the
+   `dtlab-*` commands. From then on the student lives entirely inside
+   that container (its terminal + the browser-based Lab Desktop). The
+   repo is the blueprint; the codespace is the building. With
+   **prebuilds** enabled, GitHub bakes the image ahead of time from the
+   frozen commit, so all 161 students get an instant, bit-identical
+   environment.
+
+4. **Nothing ever flows back into the repo.** Personas, logs, picks,
+   and the evidence zip exist only inside each student's codespace and
+   leave it exactly once — as the zip uploaded to the LMS. Students
+   have no reason (or route) to push commits; the `.gitignore` data
+   patterns are belt-and-suspenders for lab machines.
+
+5. **The one "local" path involves no students either:** if Codespaces
+   is unavailable, the INSTRUCTOR runs `provisioning/provision.sh` once
+   on a clean VM, snapshots it, and distributes the image
+   (`provisioning/VM_DISTRIBUTION.md`). Students import a VM; still no
+   cloning.
+
+In short: the only people who ever clone this repo are the instructor,
+the TA, and GitHub's own build machinery. Freeze the design, get CI
+green, enable prebuilds — that commit IS the course environment.
+
 ## Who uses what (one repo, three audiences)
 
 This is deliberately ONE repo — students' codespaces, the TA's checklists,
