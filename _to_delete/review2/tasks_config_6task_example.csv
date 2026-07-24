@@ -1,7 +1,0 @@
-task_id,frame,short_name,product_type,category_class,budget_min_inr,budget_max_inr
-1,Self-purchase,Sneakers,a pair of sneakers or casual shoes that fit your style,hedonic,1000,2500
-2,Self-purchase,Power bank,a power bank that fits how you actually use your phone,utilitarian,800,1500
-3,Self-purchase,Backpack,a backpack you would carry to class and placement interviews,utilitarian,1000,2500
-4,Self-purchase,Laptop,a laptop you would buy for your next two years of work and placement season,utilitarian,40000,120000
-5,Self-purchase,Perfume,a fragrance you would wear,hedonic,800,1500
-6,Self-purchase,Speaker,a Bluetooth speaker for your hostel room,hedonic,1000,2500
