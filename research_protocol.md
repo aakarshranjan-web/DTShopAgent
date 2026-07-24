@@ -136,7 +136,7 @@ GenAI quality-assurance metascience agenda).
 - `student_start.sh` refuses to launch if raw export files or PII-named
   files sit in the agent workspace.
 - API keys belong to the students' own Anthropic accounts. Each account
-  carries a personal monthly spend limit (~$20, set during the pre-week
+  carries a personal monthly spend limit (~$20, set during the Monday
   checklist and confirmed at pre-flight); the key lives only in the
   student's 600-permission env file, is content-redacted from every
   packed artifact by `dtlab-pack`, and the student can delete it from

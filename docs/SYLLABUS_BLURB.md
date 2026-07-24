@@ -1,14 +1,37 @@
-# Syllabus text — lab project & capstone
+# Syllabus text — week 2, lab project & capstone
 
 Copy-paste blocks for the course outline. Timing placeholders in
 [brackets].
 
 ---
 
-**Lab Project: Your Digital Twin Goes Shopping (Individual, in-class)**
-Runs: Sessions 6–10 (lab week) · Prerequisites due Sunday before:
-consent, consumer-profile questionnaire, Anthropic account with API key
-and spend limit, GitHub account (LMS checklist).
+## Week 2 — session lines (generic 2-line format: topic + prep)
+
+Session 6 (Mon) — **Introduction to Agentic AI: When Software Starts Acting**
+Prep: Read "Regulating advanced artificial agents" and be prepared to discuss in front of class. http://aima.cs.berkeley.edu/~russell/papers/science24-LTPA.pdf
+
+Session 7 (Tue) — **Autonomous Agents: Components, Architectures and Governance**
+Prep: Skim the course lab repository. https://github.com/dringel/DTShopAgent
+
+Session 8 (Wed) — **Building Autonomous Agents with NousResearch's Hermes-Agent**
+Prep: Browse the Hermes-Agent repository. https://github.com/nousresearch/hermes-agent
+
+Session 9 (Thu) — **When to Specialize: Generative-AI Model Portfolios for Demand Sensing and Governance**
+Prep: Read the working paper and be prepared to discuss in front of class. [When to Specialize — link]
+
+Session 10 (Fri) — **Hyperpersonalization as an Operations Problem: Governing GenAI-Agentic Demand Commitments**
+Prep: Read the working paper and be prepared to discuss in front of class. [Governing GenAI-Agentic Demand Commitments — link]
+
+CAPSTONE Assignment (Individual, due by end of the course) — **Agentic AI for Consumer Shopping** (3–5 page essay; details distributed in class).
+
+---
+
+## Lab project (Individual, in-class)
+
+**Lab Project: Your Digital Twin Goes Shopping**
+Runs: Sessions 6–10 · Setup assigned in Session 6 (consent,
+consumer-profile questionnaire, Anthropic account with API key and
+spend limit — due Monday 22:00); the lab environment is built in class.
 
 Configure an autonomous AI agent as *your* consumer digital twin —
 grounded in your 115-item consumer profile and your real amazon.in
@@ -22,15 +45,16 @@ them against your own through a structured verdict capture (per task
 and run: better/identical/equivalent/inferior, satisfaction ratings,
 and your rationale). Everything is validated and bundled into one
 submission zip by `dtlab-pack` and uploaded via the BITSoM LMS on
-Friday.
-Research participation is optional and separable from the course
-requirement (see consent sheet).
+Friday. Research participation is optional and separable from the
+course requirement (see consent sheet).
 
 ---
 
+## Capstone (Individual essay)
+
 **Capstone: Agentic AI for Consumer Shopping (Individual essay)**
-Out: [weekend after lab week], when the cohort report is shared ·
-Due: [~1 week after course end] · 3–5 pages, PDF via LMS.
+Out: [when the cohort report is shared, after Friday] ·
+Due: [end of course] · 3–5 pages, PDF via LMS.
 
 After Friday's submissions the instructor generates the cohort-level
 results report across all students and shares it with the class. Your

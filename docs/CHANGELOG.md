@@ -21,6 +21,24 @@
   never enters git; the VM fallback is instructor-built. Freeze →
   CI green → prebuilds, in that order.
 
+## 2026-07-23 — Monday-assigned setup + syllabus week-2 text
+
+- **Nothing is assigned to students before Session 6** (instructor
+  constraint). The pre-week student checklist is replaced by **Monday
+  homework, assigned in Session 6, due Monday 22:00**: consent, the
+  115-item Form, Anthropic account/key/$20 limit. This works because
+  the questionnaire needs only the Form link + pseudonym (any device —
+  no repo or codespace dependency); personas are batch-generated Monday
+  night. Session 6's checkpoint 1 becomes "codespace built + Lab
+  Desktop opens" (no key needed); the agent smoke run and key entry
+  move to Tuesday's checkpoint 2. Docs updated: COURSE_PLAN (before-
+  the-week/Monday-homework sections, Session 6/7 tables, risk rows),
+  README, TA_ONBOARDING, research_protocol §4, design_rationale §2.
+- **docs/SYLLABUS_BLURB.md** now carries the punchy week-2 syllabus
+  block (session hooks + preps + links + Monday-homework line) ahead of
+  the lab-project and capstone blurbs.
+
+
 ## 2026-07-23 — Post-revision consistency review (full-repo pass)
 
 Independent review after the major revision; all suites re-run green in

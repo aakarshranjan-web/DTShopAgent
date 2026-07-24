@@ -242,7 +242,8 @@ hard-coded anywhere.
 ## Claude API configuration
 
 - **Each student uses their own Anthropic account and API key** (created
-  before lab week per the LMS setup checklist: Console account, billing,
+  as Monday-evening homework per the LMS setup checklist: Console
+  account, billing,
   a small credit purchase, a personal **monthly spend limit of ~$20** set
   in Console settings, then one API key). Rate limits are therefore
   per-student — ~80 concurrent agents share nothing, and one agent's
@@ -285,14 +286,15 @@ hard-coded anywhere.
 
 ## Student experience (the whole thing, from their side)
 
-1. Pre-week checklist (LMS, done from home): consent, the 115-item Form
-   (~30 min), own Anthropic account + API key + $20 spend limit, GitHub
-   account.
+1. Monday (Session 6): GitHub account + codespace created in class;
+   that evening's homework (assigned Monday, due 22:00): consent, the
+   115-item Form (~30 min, phone is fine), own Anthropic account + API
+   key + $20 spend limit. Personas are generated centrally overnight.
 2. Monday–Tuesday, in class: create/log into GitHub → **Create
    codespace** (~4–6 min first build; instant with prebuilds) → open the
    forwarded **Lab Desktop** port (noVNC; per-codespace password printed
-   in the terminal — NEVER set the port to Public) → smoke test →
-   persona zip in → pre-flight green.
+   in the terminal — NEVER set the port to Public) → Tuesday: API key
+   in, persona zip in, pre-flight green, sandbox smoke run watched.
 3. (No data-export step — the agent reads the order history itself
    during its Bootstrap on the first run of each day.)
 4. Wednesday: pause Browsing History (pre-flight gate), then

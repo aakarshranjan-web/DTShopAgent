@@ -209,12 +209,13 @@ concrete machinery, so you recognize it when you see it:
       category selector, URL parsing) and, only if the research add-on
       is used, `data-pipeline/scrape_orders.py` (SELECTORS dict is the
       single patch point).
-- [ ] **API-account setup checklist (pre-week homework):** publish the
+- [ ] **API-account setup checklist (Monday homework — assigned in
+      Session 6, due Monday 22:00):** publish the
       LMS checklist — create your own Anthropic Console account, complete
       billing with a small credit purchase, set a personal **monthly
       spend limit of ~$20** in Console settings, generate one API key,
       store it only where dtlab-start puts it. Verify completion against
-      the roster via the session-1 smoke test; hold 2–3 course-owned
+      the roster at Tuesday's pre-flight (checkpoint 2); hold 2–3 course-owned
       spare keys for failed setups. Rate limits are per account, so ~80
       concurrent agents share nothing.
 - [ ] Build the LMS assignment sheet BEFORE the lab week: pseudonym,

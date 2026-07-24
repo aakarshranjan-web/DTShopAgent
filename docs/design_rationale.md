@@ -57,7 +57,7 @@ and a TA work item to log every deviation.
 ## 2. Model backend: Claude API, student-owned accounts
 
 **Decision (updated 2026-07).** Claude (Sonnet-class) via each student's
-**own Anthropic account and API key**, set up before lab week from an
+**own Anthropic account and API key**, set up as day-1 homework from an
 LMS checklist (Console account, billing, small credit purchase, a
 personal ~$20 monthly spend limit, one key). The pre-flight collects the
 key with hidden input into a 600-permission env file; the packer redacts
