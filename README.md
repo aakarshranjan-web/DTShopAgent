@@ -26,7 +26,7 @@ with a research-grade data pipeline.
 > It is the single authority on the plan: Sessions 6–10, picks committed
 > Wednesday, the four agent runs (2×2: persona/ablated ×
 > economy/frontier) on Thursday and Friday, partner-blinded, capstone
-> essay after. Standing simplifications: the agent reads the purchase
+> white paper after. Standing simplifications: the agent reads the purchase
 > history itself at Bootstrap (`data-pipeline/` is an optional research
 > add-on); infrastructure is GitHub Codespaces on free personal
 > accounts; the agent shops the full site with only

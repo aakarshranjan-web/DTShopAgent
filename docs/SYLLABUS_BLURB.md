@@ -22,7 +22,7 @@ Prep: Read the working paper and be prepared to discuss in front of class. [When
 Session 10 (Fri) — **Hyperpersonalization as an Operations Problem: Governing GenAI-Agentic Demand Commitments**
 Prep: Read the working paper and be prepared to discuss in front of class. [Governing GenAI-Agentic Demand Commitments — link]
 
-CAPSTONE Assignment (Individual, due by end of the course) — **Agentic AI for Consumer Shopping** (3–5 page essay; details distributed in class).
+CAPSTONE Assignment (Individual, due by end of the course) — **Agentic AI for Consumer Shopping** (white paper, up to 5 pages; details distributed in class).
 
 ---
 
@@ -50,33 +50,28 @@ course requirement (see consent sheet).
 
 ---
 
-## Capstone (Individual essay)
+## Capstone (Individual)
 
-**Capstone: Agentic AI for Consumer Shopping (Individual essay)**
-Out: [when the cohort report is shared, after Friday] ·
-Due: [end of course] · 3–5 pages, PDF via LMS.
+**Capstone (Individual)**
+Out: after Session 10, when the cohort results report is shared ·
+Due: by end of course.
 
-After Friday's submissions the instructor generates the cohort-level
-results report across all students and shares it with the class. Your
-capstone turns this evidence into insight. Requirements:
-
-- **Two evidence sources, both used:** your own experience and evidence
-  pack (your verdicts, ratings, decision logs, head-to-heads) and the
-  cohort report (agreement rates, questionnaire effect, model-tier
-  effect, process comparisons, sponsored capture, contamination).
-- **Analysis of the findings:** where twins chose well or failed, what
-  the questionnaire measurably added over revealed behavior, what the
-  frontier model changed relative to the economy model, and how agent
-  shopping *processes* differed from human ones — go beyond restating
-  the charts to *why*.
-- **Business implications:** what agentic shopping means for retailers,
-  brands, and platforms — search and ranking, advertising when the
-  "shopper" is an agent, loyalty, pricing.
-- **Policy implications:** consumer protection, transparency and
-  disclosure, data protection, accountability when agents transact.
-- **Personal implications:** would you delegate real spending authority
-  to your twin — for what, with what caps and guardrails, and what would
-  have to improve first.
-- Cite specific numbers from the cohort report and specific moments from
-  your own logs. Graded on depth of analysis and quality of argument —
-  not on how well your twin performed.
+The Capstone leverages the week-2 lab project in which each student
+built an autonomous AI agent as their consumer digital twin and then
+competes against it on a standardized amazon.in shopping task set. The
+deliverable for the Capstone is a white paper (report) of up to 5 pages
+on **Agentic AI for Consumer Shopping**. The inputs are at minimum two
+bodies of evidence (both required): (1) students' own evidence pack
+from the lab (their picks vs. the agent's, verdicts, satisfaction
+ratings, decision logs) and (2) the cohort-level results report the
+instructor generates across all students. To receive an A, students
+must additionally incorporate new analyses (deeper analyses and/or
+additional experiments with their agents) as well as external insights
+and information from credible academic papers and reports (full
+citations in APA style required). The use of genAI and vibe coding is
+encouraged for additional analyses and experiments. The delivered white
+paper (report) is expected to be polished and without typical genAI
+lingo/jargon and writing style. It must discuss implications for
+business, policy, and consumers. The Capstone is graded on depth of
+analysis and quality of argument — not on how well a student's agentic
+AI twin performed.

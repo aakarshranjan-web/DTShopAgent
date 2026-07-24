@@ -121,18 +121,23 @@ Tuesday-morning stragglers are recoverable).
 
 **After Friday:** instructor runs `tools/analyze_cohort.py` across both
 sections' zips, shares the cohort report with the class (weekend).
-Full-class discussion of the report happens through the capstone essay
+Full-class discussion of the report happens through the capstone white
+paper
 (and in any spare course slot if available).
 
-## Capstone (individual essay)
+## Capstone (individual white paper)
 
-Out: when the cohort report is shared · Due: ~1 week after course end ·
-3–5 pages. Full text: `docs/SYLLABUS_BLURB.md`. In short: using BOTH
-your own evidence pack and the cohort report, analyze the findings
-(what the questionnaire added, what the frontier model changed, how
-agent and human shopping processes differed) and draw the implications
-for business, for policy, and for yourself as a consumer. Graded on
-depth of analysis — not on how well your twin performed.
+Out: when the cohort report is shared · Due: end of course · white
+paper (report) of up to 5 pages. Full text: `docs/SYLLABUS_BLURB.md`.
+In short: using BOTH your own evidence pack and the cohort report,
+analyze the findings (what the questionnaire added, what the frontier
+model changed, how agent and human shopping processes differed) and
+draw the implications for business, for policy, and for consumers. An
+A additionally requires new analyses (deeper analyses and/or extra
+experiments with the agent — genAI and vibe coding encouraged) plus
+external insights from credible academic papers and reports (APA
+citations); polished prose free of genAI lingo. Graded on depth of
+analysis and quality of argument — not on how well the twin performed.
 
 ## What can go wrong at N=161, and the pre-decided answer
 
