@@ -102,6 +102,7 @@ cp -v "$KIT/agent/SOUL.md"                 "$HOME/dtlab/workspace/SOUL.md"
 # swaps the workspace SOUL.md per condition when the factor is enabled)
 mkdir -p "$HOME/dtlab/soul"
 cp -v "$KIT/agent/SOUL.md" "$KIT/agent/SOUL_ablated.md" \
+      "$KIT/agent/SOUL_nohistory.md" \
       "$KIT/agent/SOUL_sandbox.md" "$KIT/agent/SOUL_bootstrap.md" \
       "$HOME/dtlab/soul/"
 cp -v "$KIT/templates/comparison_ablation.md" \
@@ -226,6 +227,77 @@ case "${1:-status}" in
     else echo "Grounding switch: not set (dtlab-start uses the counterbalance sheet as normal)"
     fi ;;
   *) echo "usage: dtlab-persona on|off|clear|status" >&2; exit 1 ;;
+esac
+EOF
+cat > "$HOME/.local/bin/dtlab-update" <<'EOF'
+#!/usr/bin/env bash
+# Pull course fixes into an ALREADY-RUNNING codespace.
+#
+# Two things have to happen and only the first is obvious. "Use this
+# template" copies have NO git link back to the course repo, so an
+# upstream remote is added on first use. And ~/dtlab (the SOULs, config
+# and dtlab-* commands the lab actually reads) is provisioned ONCE when
+# the codespace is created — so after merging we re-run setup.sh, or the
+# new files sit in the repo and never reach the runtime.
+#
+# Your own data is untouched: runs/, quarantine/, the persona files and
+# the frozen purchase profile are never rewritten by setup.sh.
+set -euo pipefail
+UPSTREAM="https://github.com/dringel/DTShopAgent.git"
+KIT=$(ls -d /workspaces/*/.devcontainer 2>/dev/null | head -1 | xargs -r dirname)
+if [ -z "$KIT" ] || [ ! -d "$KIT/.git" ]; then
+  echo "Could not find the lab repo under /workspaces — tell a TA." >&2
+  exit 1
+fi
+cd "$KIT"
+if ! git diff --quiet || ! git diff --cached --quiet; then
+  echo "You have uncommitted edits in $KIT."
+  echo "The lab never asks you to edit repo files — if you did not do this"
+  echo "deliberately, tell a TA rather than continuing."
+  exit 1
+fi
+git remote get-url upstream >/dev/null 2>&1 || git remote add upstream "$UPSTREAM"
+echo "Fetching course updates..."
+git fetch --quiet upstream
+if git merge --ff-only upstream/main 2>/dev/null; then
+  echo "Repo updated (fast-forward)."
+else
+  # "Use this template" copies start from a fresh initial commit and
+  # share NO history with the course repo, so a merge is impossible by
+  # construction. Take upstream's files instead — the lab never asks a
+  # student to edit repo files, so there is nothing of theirs to lose.
+  echo "No shared history (template copy) — taking the course files."
+  git checkout upstream/main -- . || {
+    echo "Could not apply the course files — tell a TA." >&2; exit 1; }
+  # checkout writes the files AND stages them, which would trip the
+  # dirty-tree guard above on the NEXT run — the update would lock
+  # itself out after succeeding once. Commit so the tree ends clean.
+  git -c user.email=lab@dtlab -c user.name="DT Lab" \
+      commit -qm "course update" >/dev/null 2>&1 || true
+  echo "Repo files updated."
+fi
+echo "Re-provisioning ~/dtlab ..."
+bash "$KIT/.devcontainer/setup.sh" >/dev/null
+echo "Done. Your runs, personas and shopping session were not touched."
+EOF
+cat > "$HOME/.local/bin/dtlab-history" <<'EOF'
+#!/usr/bin/env bash
+# Manual purchase-history switch, announced live in class like
+# dtlab-persona. OFF removes the frozen purchase_profile.md from the
+# workspace for that run (the agent gets the questionnaire only). The
+# questionnaire factor and the model tier are UNAFFECTED. Both factors
+# off at once is refused by dtlab-start — that leaves no grounding.
+set -euo pipefail
+SW="$HOME/dtlab/history_switch.txt"
+case "${1:-status}" in
+  on)  echo on  > "$SW"; echo "History switch: ON — next run reads your purchase profile." ;;
+  off) echo off > "$SW"; echo "History switch: OFF — next run has no purchase history (questionnaire only)." ;;
+  clear) rm -f "$SW"; echo "Switch cleared — history defaults to ON." ;;
+  status)
+    if [ -f "$SW" ]; then echo "History switch: $(cat "$SW") (set)"
+    else echo "History switch: not set (defaults to ON — purchase profile is read)"
+    fi ;;
+  *) echo "usage: dtlab-history on|off|clear|status" >&2; exit 1 ;;
 esac
 EOF
 cat > "$HOME/.local/bin/dtlab-tier" <<'EOF'

@@ -104,7 +104,12 @@ def load_config():
 CFG = load_config()
 ID_RE = re.compile(CFG.get("DTLAB_ID_PATTERN", r"DT[0-9]{4}-[0-9]{3}"))
 ASIN_RE = re.compile(r"[A-Z0-9]{10}")
-CONDITIONS = ("persona", "ablated")
+CONDITIONS = ("persona", "ablated", "nohistory")
+# The 2x2's grounding pair specifically. Distinct from CONDITIONS, which
+# is the allowlist of every valid condition: the 2x2 predates the
+# purchase-history factor and pairs persona against ablated only, so its
+# day-balance checks must name that pair rather than "all valid values".
+PAIR_CONDITIONS = ("persona", "ablated")
 TIERS = ("economy", "frontier")
 
 
@@ -139,7 +144,8 @@ def derived_task_order(student_id, task_ids):
 # "PROTOCOL | soul=<token>" — the per-variant token proves the agent
 # loaded the intended instructions, machine-checked per run.
 PROTO_RE = re.compile(r"(?m)^\s*PROTOCOL\s*\|\s*soul=([\w.-]+)")
-SOUL_TOKENS = {"persona": "persona-v4", "ablated": "ablated-v4"}
+SOUL_TOKENS = {"persona": "persona-v4", "ablated": "ablated-v4",
+               "nohistory": "nohistory-v4"}
 BOOTSTRAP_TOKEN = "bootstrap-v1"
 
 # ---- bootstrap transcripts (P0.1 decision, 2 Sep 2026): the
@@ -1045,7 +1051,8 @@ def main():
             sdir = staging / rn
             sdir.mkdir(exist_ok=True)
             for f in ("decision_log.md", "agent_picks.csv",
-                      "condition.txt", "tier.txt", "started_at.txt",
+                      "condition.txt", "history.txt",
+                      "tier.txt", "started_at.txt",
                       "ist_date.txt", "soul_sha256.txt",
                       "config_sha256.txt", "model_id.txt",
                       "purchase_profile.md", "token_usage.json"):
@@ -1067,7 +1074,7 @@ def main():
             for day, pair in ((1, ("run1", "run2")), (2, ("run3", "run4"))):
                 got = {conds[rn] for rn in pair if rn in conds}
                 if len([rn for rn in pair if rn in conds]) == 2:
-                    need(got == set(CONDITIONS),
+                    need(got == set(PAIR_CONDITIONS),
                          f"2x2 design: day-{day} runs must be one persona "
                          f"and one ablated run (got "
                          f"{ {rn: conds[rn] for rn in pair if rn in conds} })")
@@ -1085,7 +1092,7 @@ def main():
                      "tiers (tier order is counterbalanced across days; "
                      f"got {day_tier})")
         elif len(conds) == 2:
-            need(set(conds.values()) == set(CONDITIONS),
+            need(set(conds.values()) == set(PAIR_CONDITIONS),
                  f"ablation factor: the two runs must be one persona and "
                  f"one ablated run (got {conds})")
 
@@ -1432,7 +1439,7 @@ def main():
         elif ablation:
             need(all(verdicts.get(f"{t}_{c}") in VERDICTS
                      for t in TASK_IDS
-                     for c in CONDITIONS),
+                     for c in PAIR_CONDITIONS),
                  "comparison.md: the ablation design needs a 'Verdict: "
                  "better|identical|equivalent|inferior' line for every "
                  "task in BOTH runs — use templates/comparison_ablation.md")
