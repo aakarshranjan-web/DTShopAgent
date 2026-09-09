@@ -1,0 +1,116 @@
+student_id,item_code,construct,question,answer,constraint
+DT2026-039,D01,Demographics,Which state or union territory do you currently live in?,Maharashtra,0
+DT2026-039,D02,Demographics,Which city do you currently live in?,Pune,0
+DT2026-039,D03,Demographics,How would you classify your city?,Metro (Tier 1),0
+DT2026-039,D04,Demographics,What is the sex that you were assigned at birth?,Male,0
+DT2026-039,D05,Demographics,"How old are you? (in years, number only)",27,0
+DT2026-039,D06,Demographics,Your age group:,25-29,0
+DT2026-039,D07,Demographics,What is the highest level of schooling or degree that you have completed?,Master's degree (enrolled),0
+DT2026-039,D08,Demographics,Which of these best describes you?,Never been married,0
+DT2026-039,D09,Demographics,"What is your present religion, if any?",Hindu,0
+DT2026-039,D10,Demographics,"Aside from weddings and funerals, how often do you attend religious services?",Once or twice a month,0
+DT2026-039,D11,Demographics,"Last year, what was your total family income from all sources, before taxes?",₹25-50 lakh,0
+DT2026-039,D12,Demographics,"In general, would you describe your political views as",Somewhat liberal,0
+DT2026-039,D13,Demographics,"Including yourself, how many people currently live in your household?",3,0
+DT2026-039,D14,Demographics,What is your current employment status?,Student,0
+DT2026-039,D15,Demographics,Which languages do you browse and shop in online?,English,0
+DT2026-039,BF01,Big Five Personality,I see myself as someone who is full of energy,4 - Agree a little,0
+DT2026-039,BF02,Big Five Personality,"I see myself as someone who is emotionally stable, not easily upset",3 - Neither agree nor disagree,0
+DT2026-039,BF03,Big Five Personality,I see myself as someone who does things efficiently,5 - Agree strongly,0
+DT2026-039,BF04,Big Five Personality,"I see myself as someone who is outgoing, sociable",4 - Agree a little,0
+DT2026-039,BF05,Big Five Personality,"I see myself as someone who is sophisticated in art, music, or literature",5 - Agree strongly,0
+DT2026-039,BF06,Big Five Personality,I see myself as someone who is considerate and kind to almost everyone,5 - Agree strongly,0
+DT2026-039,BF07,Big Five Personality,I see myself as someone who is generally trusting,4 - Agree a little,0
+DT2026-039,NC01,Need for Cognition,I would prefer complex to simple problems,5 - Agree strongly,0
+DT2026-039,NC02,Need for Cognition,I find satisfaction in deliberating hard and for long hours,4 - Agree a little,0
+DT2026-039,NC03,Need for Cognition,I prefer my life to be filled with puzzles that I must solve,3 - Neither agree nor disagree,0
+DT2026-039,AC01,Agentic and Communal Values,"How important is WEALTH (financially successful, prosperous) as a guiding principle in your life?",Very important,0
+DT2026-039,AC02,Agentic and Communal Values,How important is PLEASURE (having one's fill of life's pleasures and enjoyments) as a guiding principle in your life?,Very important,0
+DT2026-039,AC03,Agentic and Communal Values,"How important is INFLUENCE (having impact, influencing people and events) as a guiding principle in your life?",Very important,0
+DT2026-039,AC04,Agentic and Communal Values,"How important is COMPETENCE (displaying mastery, being capable, effective) as a guiding principle in your life?",Quite important,0
+DT2026-039,AC05,Agentic and Communal Values,How important is ACHIEVEMENT (reaching lofty goals) as a guiding principle in your life?,Quite important,0
+DT2026-039,AC06,Agentic and Communal Values,"How important is LOYALTY (being faithful to friends, family, and group) as a guiding principle in your life?",Extremely important,0
+DT2026-039,AC07,Agentic and Communal Values,"How important is POWER (control over others, dominance) as a guiding principle in your life?",Quite important,0
+DT2026-039,AC08,Agentic and Communal Values,"How important is EXCITEMENT (seeking adventure, risk, an exciting lifestyle) as a guiding principle in your life?",Quite important,0
+DT2026-039,AC09,Agentic and Communal Values,"How important is STATUS (high rank, wide respect) as a guiding principle in your life?",Quite important,0
+DT2026-039,AC10,Agentic and Communal Values,"How important is AUTONOMY (independent, free of others' control) as a guiding principle in your life?",Very important,0
+DT2026-039,AC11,Agentic and Communal Values,"How important is RECOGNITION (becoming notable, famous, or admired) as a guiding principle in your life?",Moderately important,0
+DT2026-039,AC12,Agentic and Communal Values,"How important is SUPERIORITY (defeating the competition, standing on top) as a guiding principle in your life?",Quite important,0
+DT2026-039,MIN01,Consumer Minimalism,I avoid accumulating lots of stuff,4 - Agree a little,0
+DT2026-039,MIN02,Consumer Minimalism,I restrict the number of things I own,5 - Agree strongly,0
+DT2026-039,MIN03,Consumer Minimalism,I actively avoid acquiring excess possessions,5 - Agree strongly,0
+DT2026-039,MIN04,Consumer Minimalism,The selection of things I own has been carefully curated,5 - Agree strongly,0
+DT2026-039,GV01,Green Values,It is important to me that the products I use do not harm the environment,4 - Agree a little,0
+DT2026-039,GV02,Green Values,My purchase habits are affected by my concern for our environment,3 - Neither agree nor disagree,0
+DT2026-039,GV03,Green Values,I am willing to be inconvenienced in order to take actions that are more environmentally friendly,2 - Disagree a little,0
+DT2026-039,SDS01,Social Desirability,I sometimes feel resentful when I don't get my way,TRUE,0
+DT2026-039,SDS02,Social Desirability,There have been times when I felt like rebelling against people in authority even though I knew they were right,FALSE,0
+DT2026-039,SDS03,Social Desirability,There have been occasions when I took advantage of someone,FALSE,0
+DT2026-039,SDS04,Social Desirability,There have been times when I was quite jealous of the good fortune of others,TRUE,0
+DT2026-039,IC01,Individualism and Collectivism,"I rely on myself most of the time, I rarely rely on others",5 - Agree strongly,0
+DT2026-039,IC02,Individualism and Collectivism,I often do my own thing,4 - Agree a little,0
+DT2026-039,IC03,Individualism and Collectivism,"My personal identity, independent of others, is very important to me",5 - Agree strongly,0
+DT2026-039,IC04,Individualism and Collectivism,It is important for me to do my job better than the others,5 - Agree strongly,0
+DT2026-039,RF01,Regulatory Focus,Rules and regulations are helpful and necessary for me,TRUE,0
+DT2026-039,RF02,Regulatory Focus,I'm not bothered about reviewing or checking things really closely,Definitely untrue,0
+DT2026-039,RF03,Regulatory Focus,I like to do things in a new way,Neither true nor untrue,0
+DT2026-039,RF04,Regulatory Focus,"I like trying out lots of different things, and am often successful in doing so",Probably not true,0
+DT2026-039,TS01,Spending Habits,Which of the following best describes your spending habits?,Somewhat spendthrift,0
+DT2026-039,TS02,Spending Habits,"Some people have trouble limiting their spending: they often spend money - for example on clothes, meals, vacations - when they would do better not to. How well does this description fit you?",Rarely,0
+DT2026-039,TS03,Spending Habits,"Other people have trouble spending money. Perhaps because spending money makes them anxious, they often don't spend money on things they should spend it on. How well does this description fit you?",Often,0
+DT2026-039,TS04,Spending Habits,"Mr. A is accompanying a good friend on a shopping spree at a local mall. In a large department store with a ""one-day-only sale"" (everything 10-60% off), he realizes he doesn't need anything, yet can't resist and ends up spending almost ₹8,000 on stuff. Mr. B, in the same situation, figures he can get great deals on items he needs, yet the thought of spending the money keeps him from buying. In terms of your own behavior, who are you more similar to?",Somewhat like B,0
+DT2026-039,NU01,Need for Uniqueness,I often combine possessions in such a way that I create a personal image that cannot be duplicated,3 - Neither agree nor disagree,0
+DT2026-039,NU02,Need for Uniqueness,Having an eye for products that are interesting and unusual assists me in establishing a distinctive image,3 - Neither agree nor disagree,0
+DT2026-039,NU03,Need for Uniqueness,"When it comes to the products I buy and the situations in which I use them, I have broken customs and rules",3 - Neither agree nor disagree,0
+DT2026-039,NU04,Need for Uniqueness,"When a product I own becomes popular among the general population, I begin to use it less",4 - Agree a little,0
+DT2026-039,SM01,Self-Monitoring,"In social situations, I have the ability to alter my behavior if I feel that something else is called for",4 - Agree a little,0
+DT2026-039,SM02,Self-Monitoring,"I have the ability to control the way I come across to people, depending on the impression I wish to give them",3 - Neither agree nor disagree,0
+DT2026-039,SM03,Self-Monitoring,I have found that I can adjust my behavior to meet the requirements of any situation I find myself in,4 - Agree a little,0
+DT2026-039,SM04,Self-Monitoring,My powers of intuition are quite good when it comes to understanding others' emotions and motives,5 - Agree strongly,0
+DT2026-039,MAX01,Maximization,I often find it difficult to shop for a gift for a friend,4 - Agree a little,0
+DT2026-039,MAX02,Maximization,"When shopping, I have a hard time finding clothing that I really love",5 - Agree strongly,0
+DT2026-039,MAX03,Maximization,"No matter what I do, I have the highest standards for myself",5 - Agree strongly,0
+DT2026-039,MAX04,Maximization,I never settle for second best,4 - Agree a little,0
+DT2026-039,CB01,Amazon.in Shopping Behavior,How many online orders do you place in a typical month (all platforms)?,2-4,0
+DT2026-039,CB02,Amazon.in Shopping Behavior,What share of your online shopping happens on Amazon.in (vs. Flipkart/Myntra/quick-commerce/others)?,Very little,0
+DT2026-039,CB03,Amazon.in Shopping Behavior,What is your typical single-order value on Amazon.in?,"₹700-1,500",0
+DT2026-039,CB04,Amazon.in Shopping Behavior,Which categories do you buy online most often? (pick up to 3),"Electronics, Fashion, Sports/fitness",0
+DT2026-039,CB05,Amazon.in Shopping Behavior,Do you have an Amazon Prime membership?,Yes - my own,0
+DT2026-039,CB06,Amazon.in Shopping Behavior,"How long do you research before buying electronics over ₹2,000?",A few days,0
+DT2026-039,CB07,Amazon.in Shopping Behavior,"Before buying, do you compare prices across platforms?",Always,0
+DT2026-039,CB08,Amazon.in Shopping Behavior,If the same item costs ₹50 less but arrives 3 days later - which do you pick?,Depends on the item,0
+DT2026-039,CB09,Amazon.in Shopping Behavior,How often do you return items you bought online?,Rarely (under 10%),0
+DT2026-039,CB10,Amazon.in Shopping Behavior,How many reviews do you typically read before buying something new?,Many (6-20),0
+DT2026-039,CB11,Amazon.in Shopping Behavior,What star rating is your minimum for an unfamiliar product?,4.0+,0
+DT2026-039,CB12,Amazon.in Shopping Behavior,Do you write reviews yourself?,Never,0
+DT2026-039,CB13,Amazon.in Shopping Behavior,"Do you notice or avoid ""Sponsored"" listings in search results?",I notice but don't mind,0
+DT2026-039,CB14,Amazon.in Shopping Behavior,"When a product has an ""Amazon's Choice"" or ""Bestseller"" badge, you...",Trust it more,0
+DT2026-039,CB15,Amazon.in Shopping Behavior,How do you usually sort or filter search results?,By rating,0
+DT2026-039,CB16,Amazon.in Shopping Behavior,During big sale events (Great Indian Festival / Prime Day) you typically...,Browse and buy opportunistically,0
+DT2026-039,CB17,Amazon.in Shopping Behavior,How often do you abandon a cart without buying?,Sometimes,0
+DT2026-039,CB18,Amazon.in Shopping Behavior,Do you use EMI / pay-later options for larger purchases?,Never,0
+DT2026-039,CB19,Amazon.in Shopping Behavior,How many gifts do you buy online per year?,3-6,0
+DT2026-039,CB20,Amazon.in Shopping Behavior,Which device do you mainly shop on?,Phone app,0
+DT2026-039,CB21,Amazon.in Shopping Behavior,Delivery to your address is typically...,2-3 days,0
+DT2026-039,CB22,Amazon.in Shopping Behavior,"Which category would you NEVER buy online, and why?",Musical Equipments,0
+DT2026-039,VC01,Values and Constraints,Dietary practice (affects food/supplement purchases):,Non-vegetarian,1
+DT2026-039,VC02,Values and Constraints,Allergies or ingredients you must avoid:,None,1
+DT2026-039,VC03,Values and Constraints,"Materials you avoid (e.g., leather, fur, specific metals):",None,1
+DT2026-039,VC04,Values and Constraints,"Ethical exclusions (e.g., no animal testing, no fast fashion):",None,1
+DT2026-039,VC05,Values and Constraints,Brands you personally boycott or refuse to buy - and why:,None,1
+DT2026-039,VC06,Values and Constraints,Fragrance sensitivity (perfumed products)?,Love strong fragrance,0
+DT2026-039,VC07,Values and Constraints,Would you accept a certified refurbished product at 30% off?,No,0
+DT2026-039,VC08,Values and Constraints,How important is warranty/after-sales service to you?,Important,0
+DT2026-039,VC09,Values and Constraints,Your aesthetic leans...,Minimal/clean,0
+DT2026-039,VC10,Values and Constraints,Colors you gravitate toward in products/clothing:,"Black, Red, Blue",0
+DT2026-039,VC11,Values and Constraints,Maximum delivery wait you accept for non-urgent items:,1 week,0
+DT2026-039,VC12,Values and Constraints,"Sizes you buy (clothing/shoe), if applicable:",Medium,0
+DT2026-039,PR01,Predictive Preferences,"You get ₹2,000 guilt-free right now. Which category does it go to?",Fashion,0
+DT2026-039,PR02,Predictive Preferences,What is the next thing you are actually planning to buy online?,Drone / Speakers/ Phone,0
+DT2026-039,PR03,Predictive Preferences,"Your dream ""small splurge"" under ₹10,000 would be:",Speaker,0
+DT2026-039,PR04,Predictive Preferences,The single item you have repurchased most often online:,Phone Screen Guard & Phone Screen Covers,0
+DT2026-039,PR05,Predictive Preferences,One brand you would never switch away from - and for what product:,Apple - Iphone,0
+DT2026-039,PR06,Predictive Preferences,A category where the cheapest option always wins for you:,Fashion,0
+DT2026-039,PR07,Predictive Preferences,A category where you always go premium:,Electronics,0
+DT2026-039,PR08,Predictive Preferences,Name one item currently in your amazon.in cart or wishlist:,None,0
+DT2026-039,PR09,Predictive Preferences,"Describe the birthday gift (max ₹1,500) you would buy your closest friend, and why:",Watch,0

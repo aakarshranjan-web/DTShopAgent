@@ -1,0 +1,13 @@
+{
+  "agent_hidden": [
+    "D04",
+    "D09",
+    "D10",
+    "D11",
+    "D12",
+    "PR02",
+    "PR08"
+  ],
+  "sensitive_excluded": true,
+  "rendered_items": 108
+}
